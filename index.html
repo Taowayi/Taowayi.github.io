@@ -1,92 +1,590 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-    <meta name="description" content="{{ site.description }}" />
-    <meta name="author" content="{{ site.author }}" />
-    <title>{{ site.title }}</title>
-    <link rel="icon" type="image/x-icon" href="{{ site.favicon }}" />
+    <meta name="description" content="Academic Webpage with Anime Style" />
+    <meta name="author" content="Moyu" />
+    <title>Moyu - 量子魔法使</title>
+
+    <!-- Icon -->
+    <link rel="icon" type="image/x-icon" href="static/assets/favicon.ico" />
+
+    <!-- Bootstrap icons-->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet" />
-    <link href="static/css/styles.css" rel="stylesheet" />
+
+    <!-- Google fonts-->
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,600;1,600&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Mulish:ital,wght@0,300;0,500;0,600;0,700;1,300;1,500;1,600;1,700&amp;display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,400;1,400&amp;display=swap"
+        rel="stylesheet" />
+    
+    <!-- Anime Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+
+    <!-- Core theme CSS (includes Bootstrap)-->
+    <link type="text/css" href="static/css/styles.css" rel="stylesheet" />
+    <link type="text/css" href="static/css/main.css" rel="stylesheet" />
+    
+    <!-- Anime Style CSS -->
+    <style>
+        :root {
+            --primary-color: #6a5acd; /* 二次元紫色 */
+            --secondary-color: #ff69b4; /* 粉红色 */
+            --dark-color: #2e2e3a; /* 深色背景 */
+            --light-color: #f8f9fa; /* 浅色背景 */
+        }
+        
+        body {
+            font-family: 'Noto Sans JP', 'Mulish', sans-serif;
+            background-color: var(--light-color);
+            color: #333;
+        }
+        
+        .header {
+            background-color: var(--dark-color) !important;
+            border-bottom: 2px solid var(--primary-color);
+        }
+        
+        .navbar-brand, .nav-link {
+            color: white !important;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+        
+        .nav-link:hover {
+            color: var(--secondary-color) !important;
+        }
+        
+        .top-section {
+            background-image: url('static/assets/img/outerspace-15.gif') !important;
+            background-size: cover;
+            background-position: center;
+            height: 300px;
+            position: relative;
+        }
+        
+        .top-section-content {
+            position: absolute;
+            bottom: 20px;
+            left: 0;
+            right: 0;
+        }
+        
+        #top-section-bg-text {
+            font-family: 'Kanit', sans-serif;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+            color: white;
+        }
+        
+        #avatar img {
+            width: 200px; /* 固定宽度 */
+            height: 200px; /* 固定高度 */
+            object-fit: cover; /* 确保图片填充且保持比例 */
+            border-radius: 80%; /* 圆形头像 */
+            border: 5px solid var(--primary-color);
+            margin-top: -75px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            transition: transform 0.3s;
+        }
+        
+        #avatar img:hover {
+            transform: scale(1.05);
+        }
+        
+        section {
+            padding: 60px 0;
+            border-bottom: 1px dashed #ccc;
+        }
+        
+        h2 {
+            color: var(--primary-color);
+            border-left: 5px solid var(--secondary-color);
+            padding-left: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .anime-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border-top: 3px solid var(--secondary-color);
+            transition: transform 0.3s;
+        }
+        
+        .anime-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .anime-badge {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin-right: 5px;
+            display: inline-block;
+        }
+        
+        footer {
+            background-color: var(--dark-color);
+            color: white;
+        }
+        
+        footer a {
+            color: var(--secondary-color);
+        }
+        
+        /* 分页样式 */
+        .page {
+            display: none;
+        }
+        
+        .page.active {
+            display: block;
+        }
+        
+        /* 动画效果 */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        
+        .float-animation {
+            animation: float 3s ease-in-out infinite;
+        }
+    </style>
+
+    <!-- Bootstrap core JS-->
+    <script type="text/javascript" src="static/js/bootstrap.bundle.min.js"></script>
+
+    <!-- For Compatability -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+
+    <!-- Markdown -->
+    <script type="text/javascript" src="static/js/marked.min.js"></script>
+
+    <!-- Mathematics -->
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            }
+        };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+        src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <!-- Core JS-->
+    <script type="text/javascript" src="static/js/scripts.js"></script>
+    <script type="text/javascript" src="static/js/js-yaml.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 分页导航功能
+            const navLinks = document.querySelectorAll('.nav-link');
+            const pages = document.querySelectorAll('.page');
+            
+            // 默认显示首页
+            document.getElementById('home-page').classList.add('active');
+            
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // 移除所有active类
+                    pages.forEach(page => page.classList.remove('active'));
+                    
+                    // 获取目标页面ID
+                    const targetId = this.getAttribute('href').substring(1);
+                    const targetPage = document.getElementById(targetId + '-page');
+                    
+                    // 显示目标页面
+                    if(targetPage) {
+                        targetPage.classList.add('active');
+                    }
+                    
+                    // 滚动到顶部
+                    window.scrollTo(0, 0);
+                });
+            });
+        });
+    </script>
 </head>
-<body>
-    {% for section in site.sections %}
-        {% if section.name == "top-section" %}
-            <section id="{{ section.name }}">
-                <div class="container">
-                    <h2>{{ section.title }}</h2>
-                    <p>{{ section.content }}</p>
-                </div>
-            </section>
-        {% elsif section.name == "home" %}
-            <section id="{{ section.name }}">
-                <div class="container">
-                    <h1>{{ section.title }}</h1>
-                    <p>{{ section.subtitle }}</p>
-                    <div>
-                        {% for link in section.links %}
-                            <a href="{{ link.url }}" class="btn btn-primary">
-                                <i class="{{ link.icon }}"></i> {{ link.text }}
-                            </a>
-                        {% endfor %}
+
+<body id="page-top">
+    <!-- Navigation-->
+    <nav class="header navbar navbar-expand-lg navbar-light fixed-top shadow-sm" id="mainNav">
+        <div class="container px-5">
+            <a class="navbar-brand fw-bold" href="#page-top">量子魔法使</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive"
+                aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+                MENU
+                <i class="bi-list"></i>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarResponsive">
+                <ul class="navbar-nav ms-auto me-4 my-3 my-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link me-lg-3" href="#home">首页</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link me-lg-3" href="#research">研究</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link me-lg-3" href="#anime">二次元</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link me-lg-3" href="#publications">论文</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link me-lg-3" href="#contact">联系</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Top Section -->
+    <section class="top-section">
+        <div class="top-section-content">
+            <div class="container px-5">
+                <h2 class="text-white display-3 lh-1 font-alt">无聊……</h2>
+            </div>
+        </div>
+    </section>
+    <!-- Top Section -->
+
+    <!-- Photo -->
+    <div class="container px-5">
+        <div id="avatar" class="float-animation">
+            <img class="shadow" src="static/assets/img/venti.jpg">
+        </div>
+        
+    </div>
+    <!-- Photo -->
+
+    <!-- Home Page -->
+    <section id="home-page" class="page">
+        <div class="container px-5">
+            <div class="row">
+                <div class="col-lg-8 mx-auto text-center">
+                    <h1>Moyu / 末玉</h1>
+                    <p class="lead">量子魔法使 | 理论物理研究者 | 二次元爱好者</p>
+                    
+                    <div class="d-flex justify-content-center my-4">
+                        <a href="https://github.com/Taowayi" class="mx-2">
+                            <span class="anime-badge"><i class="bi bi-github"></i> GitHub</span>
+                        </a>
+                        <a href="https://twitter.com/Moyu" class="mx-2">
+                            <span class="anime-badge"><i class="bi bi-twitter"></i> Twitter</span>
+                        </a>
+                        <a href="https://space.bilibili.com/251781364" class="mx-2">
+                            <span class="anime-badge"><i class="bi bi-play-btn-fill"></i> Bilibili</span>
+                        </a>
                     </div>
                 </div>
-            </section>
-        {% elsif section.name == "research" %}
-            <section id="{{ section.name }}">
-                <div class="container">
-                    <h2>{{ section.title }}</h2>
-                    {% for item in section.items %}
-                        <h3>{{ item.title }}</h3>
-                        <p>{{ item.description }}</p>
-                    {% endfor %}
-                </div>
-            </section>
-        {% elsif section.name == "anime" %}
-            <section id="{{ section.name }}">
-                <div class="container">
-                    <h2>{{ section.title }}</h2>
-                    {% for item in section.items %}
-                        <h3>{{ item.title }}</h3>
+            </div>
+            
+            <div class="row mt-5">
+                <div class="col-md-6">
+                    <div class="anime-card">
+                        <h3><i class="bi bi-mortarboard-fill"></i> 教育背景</h3>
                         <ul>
-                            {% for anime in item.list %}
-                                <li>{{ anime }}</li>
-                            {% endfor %}
+                            <!-- <li><strong>XX大学</strong> - 理论物理博士 (2023-至今)</li>
+                            <li><strong>XX大学</strong> - 物理学硕士 (2020-2023)</li>
+                            <li><strong>XX大学</strong> - 物理学学士 (2016-2020)</li> -->
+                            <li><strong>YZU</strong> - Master (2023-now)</li>
                         </ul>
-                    {% endfor %}
-                </div>
-            </section>
-        {% elsif section.name == "publications" %}
-            <section id="{{ section.name }}">
-                <div class="container">
-                    <h2>{{ section.title }}</h2>
-                    {% for item in section.items %}
-                        <h3>{{ item.title }}</h3>
+                    </div>
+                    
+                    <div class="anime-card">
+                        <h3><i class="bi bi-award-fill"></i> 荣誉奖项</h3>
                         <ul>
-                            {% for pub in item.list %}
-                                <li>{{ pub }}</li>
-                            {% endfor %}
+                            <!-- <li>国家奖学金 (2022)</li>
+                            <li>校级优秀毕业生 (2020)</li>
+                            <li>物理竞赛一等奖 (2019)</li> -->
+                            <li>NONONO</li>
                         </ul>
-                    {% endfor %}
+                    </div>
                 </div>
-            </section>
-        {% elsif section.name == "contact" %}
-            <section id="{{ section.name }}">
-                <div class="container">
-                    <h2>{{ section.title }}</h2>
-                    <form>
-                        {% for field in section.form.fields %}
-                            <div class="mb-3">
-                                <label>{{ field.name }}</label>
-                                <input type="{{ field.type }}" class="form-control" />
-                            </div>
-                        {% endfor %}
-                        <button type="submit" class="btn btn-primary">{{ section.form.submit_text }}</button>
-                    </form>
+                
+                <div class="col-md-6">
+                    <div class="anime-card">
+                        <h3><i class="bi bi-heart-fill"></i> 研究兴趣</h3>
+                        <p>我的研究主要集中在粒子物理和天文的交叉领域：</p>
+                        <div class="d-flex flex-wrap">
+                            <span class="anime-badge my-1">中子星</span>
+                            <span class="anime-badge my-1">状态方程</span>
+                            <!-- <span class="anime-badge my-1">黑洞热力学</span>
+                            <span class="anime-badge my-1">共形场论</span> -->
+                        </div>
+                    </div>
+                    
+                    <div class="anime-card">
+                        <h3><i class="bi bi-music-note-beamed"></i> 近期爱好</h3>
+                        <ul>
+                            <li>弹吉他玩玩</li>
+                            <li>追番</li>
+                            <li>参加动漫展会</li>
+                            <li>开发二次元风格物理模拟器</li>
+                        </ul>
+                    </div>
                 </div>
-            </section>
-        {% endif %}
-    {% endfor %}
+            </div>
+        </div>
+    </section>
+    <!-- Home Page -->
+
+    <!-- Research Page -->
+    <section id="research-page" class="page">
+        <div class="container px-5">
+            <h2><i class="bi bi-search"></i> 研究领域</h2>
+            
+            <!-- <div class="anime-card">
+                <h3>量子引力与全息原理</h3>
+                <p>探索AdS/CFT对偶在量子引力理论中的应用，特别是研究黑洞信息悖论和时空涌现的机制。</p>
+                <p>近期工作聚焦于：</p>
+                <ul>
+                    <li>量子混沌与全息对偶</li>
+                    <li>ER=EPR猜想</li>
+                    <li>量子纠错码与时空结构</li>
+                </ul>
+            </div> -->
+            
+            <div class="anime-card">
+                <h3>中子星物态方程</h3>
+                <p>研究中子星内部的极端条件下的物质状态，天体物理观测数据。</p>
+                <p>主要方法：</p>
+                <ul>
+                    <li>RMF相对论平均场</li>
+                    <!-- <li>有效场论模型</li> -->
+                    <li>多信使天文学数据分析</li>
+                </ul>
+            </div>
+            
+            <!-- <div class="anime-card">
+                <h3>数学物理</h3>
+                <p>研究可积系统、共形场论和拓扑量子场论中的数学结构。</p>
+                <p>当前兴趣：</p>
+                <ul>
+                    <li>顶点算子代数</li>
+                    <li>模形式与量子场论</li>
+                    <li>范畴论在物理中的应用</li>
+                </ul>
+            </div> -->
+        </div>
+    </section>
+    <!-- Research Page -->
+
+    <!-- Anime Page -->
+    <section id="anime-page" class="page">
+        <div class="container px-5">
+            <h2><i class="bi bi-joystick"></i> 二次元世界</h2>
+            
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="anime-card h-100">
+                        <h3><i class="bi bi-collection-play-fill"></i> 最爱动画</h3>
+                        <ul>
+                            <li>《关于我转生变成史莱姆这件事》</li>
+                            <li>《丹特丽安的书架》</li>
+                            <li>《风灵玉秀》</li>
+                            <!-- <li>《星际牛仔》</li>
+                            <li>《凉宫春日的忧郁》</li> -->
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="anime-card h-100">
+                        <h3><i class="bi bi-book-half"></i> 二次元创作</h3>
+                        <ul>
+                            <li>植物大战僵尸</li>
+                            <li>三国杀</li>
+                            <li>动漫剪辑</li>
+                            <!-- <li>动漫风格科学可视化</li> -->
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="anime-card h-100">
+                        <h3><i class="bi bi-music-note-list"></i> 同人音乐</h3>
+                        <ul>
+                            <li>暂无</li>
+                            <!-- <li>《薛定谔的猫箱》</li>
+                            <li>《弦理论狂想曲》</li>
+                            <li>《黑洞视界的另一边》</li> -->
+                        </ul>
+                        <p>在Bilibili和网易云音乐发布</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="anime-card mt-4">
+                <h3><i class="bi bi-code-slash"></i> 二次元×科研项目</h3>
+                <div class="row">
+                    <div class="col-md-6">
+                        <h4>暂无</h4>
+                        <!-- <h4>动漫风格物理模拟器</h4>
+                        <p>使用Unity开发的可视化工具，将复杂的物理现象以动漫风格呈现。</p>
+                        <p>功能包括：</p>
+                        <ul>
+                            <li>量子场波动可视化</li>
+                            <li>黑洞吞噬特效</li>
+                            <li>弦振动模拟</li>
+                        </ul> -->
+                    </div>
+                    <!-- <div class="col-md-6">
+                        <h4>VTuber科研直播</h4>
+                        <p>使用虚拟形象进行科学传播，内容包括：</p>
+                        <ul>
+                            <li>量子力学基础讲座</li>
+                            <li>科研日常Vlog</li>
+                            <li>论文写作技巧分享</li>
+                        </ul>
+                    </div> -->
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- Anime Page -->
+
+    <!-- Publications Page -->
+    <section id="publications-page" class="page">
+        <div class="container px-5">
+            <h2><i class="bi bi-file-text-fill"></i> 学术论文</h2>
+            
+            <div class="anime-card">
+                <h3>期刊论文</h3>
+                <li>
+                    <strong>暂无</strong>
+                </li>
+                <!-- <ul>
+                    
+                    <li>
+                        <strong>Moyu</strong>, "Holographic Quantum Error Correction in AdS/CFT", JHEP 2024
+                        <a href="#"><span class="anime-badge">PDF</span></a>
+                        <a href="#"><span class="anime-badge">arXiv</span></a>
+                    </li>
+                    <li>
+                        <strong>Moyu</strong> et al., "Neutron Star Equation of State from QCD", PRD 2023
+                        <a href="#"><span class="anime-badge">PDF</span></a>
+                    </li>
+                    <li>
+                        <strong>Moyu</strong>, "Anime-inspired Visualization of Quantum Phenomena", SciVis 2023
+                        <a href="#"><span class="anime-badge">PDF</span></a>
+                    </li>
+                </ul> -->
+            </div>
+            
+            <div class="anime-card">
+                <h3>会议报告</h3>
+                <ul>
+                    <li>"零温中子星状态方程", 2024</li>
+                    <!-- <li>"The Physics of Isekai Worlds", Comiket 2023</li>
+                    <li>"Magical Girls and Quantum Mechanics", ACG Academic Conference 2022</li> -->
+                </ul>
+            </div>
+            
+            <div class="anime-card">
+                <h3>科普作品</h3>
+                <ul>
+                    <li>暂无</li>
+                    <!-- <li>《魔法少女的弦理论指南》同人志，Comiket 2023</li>
+                    <li>《从Steins;Gate看时间旅行物理学》博客系列</li> -->
+                </ul>
+            </div>
+        </div>
+    </section>
+    <!-- Publications Page -->
+
+    <!-- Contact Page -->
+    <section id="contact-page" class="page">
+        <div class="container px-5">
+            <h2><i class="bi bi-envelope-fill"></i> 联系我</h2>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="anime-card h-100">
+                        <h3>学术联系</h3>
+                        <p><i class="bi bi-envelope"></i> <strong>Email:</strong> 保密</p>
+                        <p><i class="bi bi-building"></i> <strong>地址:</strong> 物理学院，YZU</p>
+                        <!-- <p><i class="bi bi-telephone"></i> <strong>电话:</strong> +81-XXX-XXXX-XXXX</p> -->
+                        
+                        <h4 class="mt-4">合作机会</h4>
+                        <p>欢迎对以下方向有兴趣的研究者联系：</p>
+                        <ul>
+                            <li>中子星状态方程</li>
+                            <!-- <li>科学可视化项目</li>
+                            <li>跨学科艺术科学项目</li> -->
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="anime-card h-100">
+                        <h3>二次元联系</h3>
+                        <p><i class="bi bi-twitter"></i> <strong>Twitter:</strong> @QuantumMoyu</p>
+                        <p><i class="bi bi-play-btn"></i> <strong>Bilibili:</strong> 量子魔法使</p>
+                        <p><i class="bi bi-discord"></i> <strong>Discord:</strong> Moyu#1234</p>
+                        
+                        <h4 class="mt-4">同人活动</h4>
+                        <p>参加以下活动时可以找到我：</p>
+                        <ul>
+                            <li>Comiket (夏季/冬季)</li>
+                            <li>中国国际动漫节</li>
+                            <li>漫展</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="anime-card mt-4">
+                <h3>留言板</h3>
+                <form>
+                    <div class="mb-3">
+                        <label for="name" class="form-label">姓名</label>
+                        <input type="text" class="form-control" id="name">
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">邮箱</label>
+                        <input type="email" class="form-control" id="email">
+                    </div>
+                    <div class="mb-3">
+                        <label for="message" class="form-label">留言内容</label>
+                        <textarea class="form-control" id="message" rows="3"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="background-color: var(--primary-color); border: none;">发送</button>
+                </form>
+            </div>
+        </div>
+    </section>
+    <!-- Contact Page -->
+
+    <!-- Footer-->
+    <footer class="bg-bottom text-center py-5">
+        <div class="container px-5">
+            <div class="text-white-50 small">
+                <div class="mb-2">&copy; Moyu 2025-∞. 保留所有权利。</div>
+                <a href="https://github.com/Taowayi">GitHub</a>
+                <!-- <span class="mx-1">&middot;</span>
+                <a href="https://twitter.com/QuantumMoyu">Twitter</a> -->
+                <span class="mx-1">&middot;</span>
+                <a href="https://space.bilibili.com/251781364">Bilibili</a>
+            </div>
+        </div>
+    </footer>
 </body>
 </html>
