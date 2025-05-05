@@ -1,60 +1,20 @@
 <section id="contact-page" class="page">
     <div class="container px-5">
         <h2><i class="bi bi-envelope-fill"></i> 联系我</h2>
-        
-        <div class="row">
-            <div class="col-md-6">
-                <div class="anime-card h-100">
-                    <h3>学术联系</h3>
-                    <p><i class="bi bi-envelope"></i> <strong>Email:</strong> moyu@physics.ac.jp</p>
-                    <p><i class="bi bi-building"></i> <strong>地址:</strong> 理论物理研究所，XX大学</p>
-                    <p><i class="bi bi-telephone"></i> <strong>电话:</strong> +81-XXX-XXXX-XXXX</p>
-                    
-                    <h4 class="mt-4">合作机会</h4>
-                    <p>欢迎对以下方向有兴趣的研究者联系：</p>
-                    <ul>
-                        <li>量子引力理论研究</li>
-                        <li>科学可视化项目</li>
-                        <li>跨学科艺术科学项目</li>
-                    </ul>
-                </div>
+        <form>
+            <div class="mb-3">
+                <label for="name" class="form-label">姓名</label>
+                <input type="text" class="form-control" id="name">
             </div>
-            
-            <div class="col-md-6">
-                <div class="anime-card h-100">
-                    <h3>二次元联系</h3>
-                    <p><i class="bi bi-twitter"></i> <strong>Twitter:</strong> @QuantumMoyu</p>
-                    <p><i class="bi bi-play-btn"></i> <strong>Bilibili:</strong> 量子魔法使</p>
-                    <p><i class="bi bi-discord"></i> <strong>Discord:</strong> Moyu#1234</p>
-                    
-                    <h4 class="mt-4">同人活动</h4>
-                    <p>参加以下活动时可以找到我：</p>
-                    <ul>
-                        <li>Comiket (夏季/冬季)</li>
-                        <li>中国国际动漫节</li>
-                        <li>量子物理×二次元研讨会</li>
-                    </ul>
-                </div>
+            <div class="mb-3">
+                <label for="email" class="form-label">邮箱</label>
+                <input type="email" class="form-control" id="email">
             </div>
-        </div>
-        
-        <div class="anime-card mt-4">
-            <h3>留言板</h3>
-            <form>
-                <div class="mb-3">
-                    <label for="name" class="form-label">姓名</label>
-                    <input type="text" class="form-control" id="name">
-                </div>
-                <div class="mb-3">
-                    <label for="email" class="form-label">邮箱</label>
-                    <input type="email" class="form-control" id="email">
-                </div>
-                <div class="mb-3">
-                    <label for="message" class="form-label">留言内容</label>
-                    <textarea class="form-control" id="message" rows="3"></textarea>
-                </div>
-                <button type="submit" class="btn btn-primary" style="background-color: var(--primary-color); border: none;">发送</button>
-            </form>
-        </div>
+            <div class="mb-3">
+                <label for="message" class="form-label">留言内容</label>
+                <textarea class="form-control" id="message" rows="3"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">发送</button>
+        </form>
     </div>
 </section>

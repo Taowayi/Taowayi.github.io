@@ -1,31 +1,92 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="en">
 <head>
-    <!-- 元信息保持不变 -->
-    <!-- 引入所有CSS和JS -->
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="{{ site.description }}" />
+    <meta name="author" content="{{ site.author }}" />
+    <title>{{ site.title }}</title>
+    <link rel="icon" type="image/x-icon" href="{{ site.favicon }}" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet" />
+    <link href="static/css/styles.css" rel="stylesheet" />
 </head>
-<body id="page-top">
-    <!-- 导航栏保持不变 -->
-    
-    <!-- 顶部区域保持不变 -->
-    
-    <!-- 动态加载内容区域 -->
-    <main id="content-container">
-        <!-- 这里将通过JS加载partials中的内容 -->
-    </main>
-    
-    <!-- 页脚保持不变 -->
-    
-    <script>
-        // 初始加载首页
-        window.addEventListener('DOMContentLoaded', () => {
-            loadContent('home');
-        });
-        
-        async function loadContent(page) {
-            const response = await fetch(`partials/${page}.html`);
-            document.getElementById('content-container').innerHTML = await response.text();
-        }
-    </script>
+<body>
+    {% for section in site.sections %}
+        {% if section.name == "top-section" %}
+            <section id="{{ section.name }}">
+                <div class="container">
+                    <h2>{{ section.title }}</h2>
+                    <p>{{ section.content }}</p>
+                </div>
+            </section>
+        {% elsif section.name == "home" %}
+            <section id="{{ section.name }}">
+                <div class="container">
+                    <h1>{{ section.title }}</h1>
+                    <p>{{ section.subtitle }}</p>
+                    <div>
+                        {% for link in section.links %}
+                            <a href="{{ link.url }}" class="btn btn-primary">
+                                <i class="{{ link.icon }}"></i> {{ link.text }}
+                            </a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </section>
+        {% elsif section.name == "research" %}
+            <section id="{{ section.name }}">
+                <div class="container">
+                    <h2>{{ section.title }}</h2>
+                    {% for item in section.items %}
+                        <h3>{{ item.title }}</h3>
+                        <p>{{ item.description }}</p>
+                    {% endfor %}
+                </div>
+            </section>
+        {% elsif section.name == "anime" %}
+            <section id="{{ section.name }}">
+                <div class="container">
+                    <h2>{{ section.title }}</h2>
+                    {% for item in section.items %}
+                        <h3>{{ item.title }}</h3>
+                        <ul>
+                            {% for anime in item.list %}
+                                <li>{{ anime }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endfor %}
+                </div>
+            </section>
+        {% elsif section.name == "publications" %}
+            <section id="{{ section.name }}">
+                <div class="container">
+                    <h2>{{ section.title }}</h2>
+                    {% for item in section.items %}
+                        <h3>{{ item.title }}</h3>
+                        <ul>
+                            {% for pub in item.list %}
+                                <li>{{ pub }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endfor %}
+                </div>
+            </section>
+        {% elsif section.name == "contact" %}
+            <section id="{{ section.name }}">
+                <div class="container">
+                    <h2>{{ section.title }}</h2>
+                    <form>
+                        {% for field in section.form.fields %}
+                            <div class="mb-3">
+                                <label>{{ field.name }}</label>
+                                <input type="{{ field.type }}" class="form-control" />
+                            </div>
+                        {% endfor %}
+                        <button type="submit" class="btn btn-primary">{{ section.form.submit_text }}</button>
+                    </form>
+                </div>
+            </section>
+        {% endif %}
+    {% endfor %}
 </body>
 </html>

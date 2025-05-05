@@ -1,0 +1,57 @@
+site:
+  title: "Moyu - 量子魔法使"
+  description: "Academic Webpage with Anime Style"
+  author: "Moyu"
+  favicon: "static/assets/favicon.ico"
+
+sections:
+  - name: "top-section"
+    title: "月下一杯酒，代码写春秋"
+    content: "这是顶部横幅的内容。"
+
+  - name: "home"
+    title: "Moyu / 末玉"
+    subtitle: "量子魔法使 | 理论物理研究者 | 二次元爱好者"
+    links:
+      - text: "GitHub"
+        url: "https://github.com/Moyu"
+        icon: "bi bi-github"
+      - text: "Twitter"
+        url: "https://twitter.com/Moyu"
+        icon: "bi bi-twitter"
+      - text: "Bilibili"
+        url: "https://space.bilibili.com/Moyu"
+        icon: "bi bi-play-btn-fill"
+
+  - name: "research"
+    title: "研究领域"
+    items:
+      - title: "量子引力与全息原理"
+        description: "探索AdS/CFT对偶在量子引力理论中的应用，特别是研究黑洞信息悖论和时空涌现的机制。"
+
+  - name: "anime"
+    title: "二次元世界"
+    items:
+      - title: "最爱动画"
+        list:
+          - "《命运石之门》"
+          - "《攻壳机动队》"
+
+  - name: "publications"
+    title: "学术论文"
+    items:
+      - title: "期刊论文"
+        list:
+          - "Moyu, 'Holographic Quantum Error Correction in AdS/CFT', JHEP 2024"
+
+  - name: "contact"
+    title: "联系我"
+    form:
+      fields:
+        - name: "姓名"
+          type: "text"
+        - name: "邮箱"
+          type: "email"
+        - name: "留言内容"
+          type: "textarea"
+      submit_text: "发送"
