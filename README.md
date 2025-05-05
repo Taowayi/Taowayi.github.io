@@ -2,7 +2,7 @@
 ![Github Stars](https://img.shields.io/github/stars/Yixin0313/personal-homepage-template?style=flat)
 ![License](https://img.shields.io/github/license/Yixin0313/personal-homepage-template)
 
-# 通用个人主页模板：适用于学术和求职场景 | A general-purpose template: suitable for both academic and professional use.
+# 通用个人主页模板：适用于学术和求职场景 （COPY 别人的）| A general-purpose template: suitable for both academic and professional use.
 
 ## 预览 | Preview
 [![Screenshot of the Website](https://raw.githubusercontent.com/Yixin0313/personal-homepage-template/main/screenshot_full.png)](https://yixin0313.github.io/personal-homepage-template/)
