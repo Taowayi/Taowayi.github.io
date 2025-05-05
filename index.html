@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <!-- 元信息保持不变 -->
+    <!-- 引入所有CSS和JS -->
+</head>
+<body id="page-top">
+    <!-- 导航栏保持不变 -->
+    
+    <!-- 顶部区域保持不变 -->
+    
+    <!-- 动态加载内容区域 -->
+    <main id="content-container">
+        <!-- 这里将通过JS加载partials中的内容 -->
+    </main>
+    
+    <!-- 页脚保持不变 -->
+    
+    <script>
+        // 初始加载首页
+        window.addEventListener('DOMContentLoaded', () => {
+            loadContent('home');
+        });
+        
+        async function loadContent(page) {
+            const response = await fetch(`partials/${page}.html`);
+            document.getElementById('content-container').innerHTML = await response.text();
+        }
+    </script>
+</body>
+</html>
