@@ -351,6 +351,49 @@
                 const toastEl = document.getElementById('load-toast');
                 const toastText = document.getElementById('load-toast-text');
                 let items = [];
+                const CACHE_KEY = 'inspireCache_v1';
+                const apiUrl = `https://inspirehep.net/api/literature?q=authors.recid:${authorRecid}&size=200`;
+                const cached = (() => { try { return JSON.parse(localStorage.getItem(CACHE_KEY) || 'null'); } catch { return null; } })();
+                const renderFromItems = () => {
+                    renderList('latest');
+                    const total = items.length;
+                    const citations = items.reduce((s, it) => s + (isNaN(it.cite) ? 0 : it.cite), 0);
+                    const top = [...items].sort((a, b) => b.cite - a.cite)[0];
+                    if (pubTotalEl) pubTotalEl.textContent = String(total);
+                    if (citeTotalEl) citeTotalEl.textContent = String(citations);
+                    if (top) {
+                        if (topCiteEl) topCiteEl.textContent = String(top.cite);
+                        if (topTitleEl) {
+                            topTitleEl.innerHTML = `${top.title}${top.year ? ' ('+top.year+')' : ''}`;
+                            if (window.MathJax && typeof window.MathJax.typesetPromise === 'function') {
+                                window.MathJax.typesetPromise([topTitleEl]).catch(() => {});
+                            }
+                        }
+                        const years = [...new Set(items.map(it => parseInt(it.year || '0',10)).filter(y=>y>0))].sort((a,b)=>b-a);
+                        const latestYears = years.slice(0,5).reverse();
+                        const byYear = latestYears.map(y => items.filter(it => parseInt(it.year||'0',10)===y).reduce((s,it)=>s+(isNaN(it.cite)?0:it.cite),0));
+                        const nonZero = byYear.filter(v => v > 0);
+                        const maxVal = Math.max(...(nonZero.length ? byYear : [1]));
+                        const trendBox = document.getElementById('trend-mini');
+                        if (trendBox) {
+                            const w = 60, h = 24;
+                            const step = byYear.length > 1 ? w / (byYear.length - 1) : w;
+                            const defaultY = Math.round(h * 0.6);
+                            const pts = byYear.length > 0 ? byYear.map((v,i)=>({x: Math.round(i*step), y: Math.round(h - (h * (nonZero.length ? v : 0) / maxVal)) || defaultY})) : [{x:0,y:defaultY}];
+                            const path = pts.reduce((acc,p,idx)=> acc + (idx===0?`M${p.x},${p.y}`:` L${p.x},${p.y}`),'');
+                            const svg = `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                <defs><linearGradient id="trendGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#fb7185"/><stop offset="100%" stop-color="#ff69b4"/></linearGradient></defs>
+                                <path d="${path}" fill="none" stroke="url(#trendGrad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                ${byYear.length<=1 ? `<circle cx="${pts[0].x}" cy="${pts[0].y}" r="2" fill="#fb7185"/>` : ''}
+                            </svg>`;
+                            trendBox.innerHTML = svg;
+                            const svgEl = trendBox.querySelector('svg');
+                            if (svgEl) { svgEl.style.display = 'block'; }
+                            trendBox.title = latestYears.length ? latestYears.map((y,i)=>`${y}:${byYear[i]||0}`).join(' | ') : '无趋势数据';
+                        }
+                    }
+                    if (hintEl) hintEl.textContent = `已加载 ${total} 篇文献（数据源：INSPIRE${cached ? ' · 本地缓存' : ''}）`;
+                };
                 const monthPad = (m) => {
                     if (!m) return '';
                     const mm = String(m).padStart(2, '0');
@@ -438,8 +481,50 @@
 
                 try {
                     // 抓取作者文献数据（不指定排序，前端控制）
-                    const url = `https://inspirehep.net/api/literature?q=authors.recid:${authorRecid}&size=200`;
-                    const resp = await fetch(url);
+                    // 若有缓存，先用缓存渲染
+                    if (cached && Array.isArray(cached.records)) {
+                        const records = cached.records;
+                        items = records.map(rec => {
+                            const meta = rec.metadata || {};
+                            let title = (meta.titles && meta.titles[0] && meta.titles[0].title) ? meta.titles[0].title : '(无标题)';
+                            const toTeX = (html) => {
+                                if (!html) return html;
+                                html = html.replace(/&amp;/g, '&');
+                                html = html.replace(/<math[^>]*>([\s\S]*?)<\/math>/gi, (m, inner) => {
+                                    let text = inner
+                                        .replace(/<mi[^>]*>/gi, '')
+                                        .replace(/<mo[^>]*>/gi, '')
+                                        .replace(/<mn[^>]*>/gi, '')
+                                        .replace(/<mrow[^>]*>/gi, '')
+                                        .replace(/<\/(mi|mo|mn|mrow)>/gi, '')
+                                        .trim();
+                                    return text ? `$${text}$` : m;
+                                });
+                                return html;
+                            };
+                            title = toTeX(title);
+                            const pubInfo = (meta.publication_info && meta.publication_info[0]) ? meta.publication_info[0] : {};
+                            const year = pubInfo.year ? pubInfo.year : (meta.earliest_date || '').slice(0,4);
+                            const month = pubInfo.month ? monthPad(pubInfo.month) : ((meta.earliest_date || '').slice(5,7));
+                            const yearMonth = (year && month) ? `${year}-${month}` : (year || '');
+                            const cite = typeof meta.citation_count === 'number' ? meta.citation_count : 0;
+                            const link = meta.links && meta.links[0] && meta.links[0].value ? meta.links[0].value : (meta.urls && meta.urls[0] && meta.urls[0].value ? meta.urls[0].value : undefined);
+                            const id = (meta.control_number || rec.id);
+                            const journalTitle = pubInfo.journal_title || (pubInfo.journal_title_abbrev || '');
+                            const docTypes = Array.isArray(meta.document_type) ? meta.document_type.map(dt => String(dt).toLowerCase()) : [];
+                            const hasArXiv = Array.isArray(meta.arxiv_eprints) ? meta.arxiv_eprints.length > 0 : false;
+                            const refereed = !!meta.refereed;
+                            const isPreprint = !refereed && (docTypes.includes('preprint') || (hasArXiv && !journalTitle));
+                            const journalShort = isPreprint ? 'Preprint' : getJournalAbbrev(journalTitle);
+                            return { title, year, yearMonth, cite, link, id, journalShort };
+                        });
+                        renderFromItems();
+                    }
+
+                    // 条件请求（若有 ETag）：仅在变更时更新
+                    const headers = new Headers();
+                    if (cached && cached.etag) headers.set('If-None-Match', cached.etag);
+                    const resp = await fetch(apiUrl, { headers });
                     if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
                     const data = await resp.json();
                     const records = (data.hits && data.hits.hits) ? data.hits.hits : [];
@@ -482,8 +567,7 @@
                         const journalShort = isPreprint ? 'Preprint' : getJournalAbbrev(journalTitle);
                         return { title, year, yearMonth, cite, link, id, journalShort };
                     });
-                    // 默认按最新展示
-                    renderList('latest');
+                    renderFromItems();
 
                     const total = items.length;
                     const citations = items.reduce((s, it) => s + (isNaN(it.cite) ? 0 : it.cite), 0);
@@ -530,6 +614,11 @@
                                                 }
                     }
 
+                    // 写入缓存（含 ETag 与原始 records）
+                    try {
+                        const etag = resp.headers ? (resp.headers.get('ETag') || resp.headers.get('etag')) : undefined;
+                        localStorage.setItem(CACHE_KEY, JSON.stringify({ etag, timestamp: Date.now(), records }));
+                    } catch {}
                     if (hintEl) hintEl.textContent = `已加载 ${total} 篇文献（数据源：INSPIRE）`;
                     // 漂浮提醒胶囊：2秒淡出
                     if (toastEl && toastText) {
@@ -576,7 +665,11 @@
                     // 初次加载根据当前模式设定顶部背景
                     applyBannerTheme();
                 } catch (err) {
-                    if (hintEl) hintEl.textContent = `INSPIRE 加载失败：${err.message}`;
+                    if (cached && Array.isArray(cached.records)) {
+                        if (hintEl) hintEl.textContent = `INSPIRE 校验失败，已使用本地缓存：${err.message}`;
+                    } else {
+                        if (hintEl) hintEl.textContent = `INSPIRE 加载失败：${err.message}`;
+                    }
                 }
             })();
 
