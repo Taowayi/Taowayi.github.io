@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <meta name="description" content="Academic Webpage with Anime Style" />
+    <meta name="author" content="Moyu" />
+    <title>Moyu - 量子魔法使 </title>
+
+    <!-- Icon -->
+    <link rel="icon" type="image/x-icon" href="static/assets/favicon.ico" />
+
+    <!-- Bootstrap icons-->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css" rel="stylesheet" />
+
+    <!-- Google fonts-->
+    <link rel="preconnect" href="https://fonts.gstatic.com" />
+    <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,wght@0,600;1,600&amp;display=swap"
+        rel="stylesheet" />
+            <!-- 合并：最近在看 + 动漫清单 -->
+            <div class="anime-card mt-4">
+                <h3><i class="bi bi-collection-play-fill"></i> 动漫清单 · 最近在看</h3>
+                <p class="mb-3">
+                    <a href="https://www.bilibili.com/bangumi/play/ss6038?spm_id_from=333.337.0.0" target="_blank">
+                        <img src="https://img.shields.io/badge/《风灵玉秀》-第二季热播中-FF69B4?style=for-the-badge&logo=bilibili" alt="风灵玉秀">
+                    </a>
+                    <a href="https://www.bilibili.com/bangumi/play/ss48852?spm_id_from=333.1387.0.0" target="_blank">
+                        <img src="https://img.shields.io/badge/《转生史莱姆》-第三季制作决定-FB7299?style=for-the-badge&logo=bilibili" alt="关于我转生变成史莱姆这档事">
+                    </a>
+                    <a href="https://www.bilibili.com/video/BV1VV411e7Wr/?spm_id_from=333.1387.0.0" target="_blank">
+                        <img src="https://img.shields.io/badge/丹特丽安-剪辑-161B33?style=for-the-badge&logo=atom&logoColor=white" alt="丹特丽安的书架剪辑">
+                    </a>
+                </p>
+            --dark-color: #2e2e3a; /* 深色背景 */
+            --light-color: #f8f9fa; /* 浅色背景 */
+        }
+        
+        body {
+            font-family: 'Noto Sans JP', 'Mulish', sans-serif;
+            background-color: var(--light-color);
+            color: #333;
+        }
+        
+        .header {
+            background-color: var(--dark-color) !important;
+            border-bottom: 2px solid var(--primary-color);
+        }
+        
+        .navbar-brand, .nav-link {
+            color: white !important;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+        
+        .nav-link:hover {
+            color: var(--secondary-color) !important;
+        }
+        
+        .top-section {
+            position: relative;
+            height: 260px;
+            overflow: hidden;
+        }
+
+        .top-section .banner-img {
+            position: absolute;
+            border-radius: 80%; /* 圆形头像 */
+            border: 5px solid var(--primary-color);
+            margin-top: -75px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            transition: transform 0.3s;
+        }
+        
+        #avatar img:hover {
+            transform: scale(1.05);
+        }
+        
+        section {
+            padding: 60px 0;
+            border-bottom: 1px dashed #ccc;
+        }
+        
+        h2 {
+            color: var(--primary-color);
+            border-left: 5px solid var(--secondary-color);
+            padding-left: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .anime-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            border-top: 3px solid var(--secondary-color);
+            transition: transform 0.3s;
+        }
+        
+        .anime-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .anime-badge {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin-right: 5px;
+            display: inline-block;
+        }
+        
+        footer {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,.05) 10px, rgba(255,255,255,.05) 20px),
+                repeating-linear-gradient(-45deg, transparent, transparent 10px, rgba(255,255,255,.05) 10px, rgba(255,255,255,.05) 20px);
+            pointer-events: none;
+        }
+        
+        footer .container {
+            position: relative;
+            z-index: 1;
+        }
+        
+        footer a {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        footer a:hover {
+            color: var(--secondary-color);
+        }
+        
+        /* 分页样式 */
+        .page {
+            display: none;
+        }
+        
+        .page.active {
+            display: block;
+        }
+        
+        /* 动画效果 */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+            100% { transform: translateY(0px); }
+        }
+        
+        .float-animation {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        /* 访问计数器样式 */
+        #visitor-counter {            
+            text-align: center; /* 居右对齐 */
+        }
+
+        #visitor-counter img {
+            max-width: 200px; /* 将图片宽度加大一倍 */
+            height: auto; /* 保持图片比例 */
+        }
+    </style>
+
+            <!-- 最近在看 -->
+            <div class="anime-card mt-4">
+                <h3><i class="bi bi-tv"></i> 最近在看</h3>
+                <p>
+                    <a href="https://www.bilibili.com/bangumi/play/ss6038?spm_id_from=333.337.0.0" target="_blank">
+                        <img src="https://img.shields.io/badge/《风灵玉秀》-第二季热播中-FF69B4?style=for-the-badge&logo=bilibili" alt="风灵玉秀">
+                    </a>
+                    <a href="https://www.bilibili.com/bangumi/play/ss48852?spm_id_from=333.1387.0.0" target="_blank">
+                        <img src="https://img.shields.io/badge/《转生史莱姆》-第三季制作决定-FB7299?style=for-the-badge&logo=bilibili" alt="关于我转生变成史莱姆这档事">
+                    </a>
+                    <a href="https://www.bilibili.com/video/BV1VV411e7Wr/?spm_id_from=333.1387.0.0" target="_blank">
+                        <img src="https://img.shields.io/badge/丹特丽安-剪辑-161B33?style=for-the-badge&logo=atom&logoColor=white" alt="中子星物理">
+                    </a>
+                </p>
+            </div>
+
+            <!-- 动漫清单 -->
+            <div class="anime-card mt-4">
+                <h3><i class="bi bi-collection-play-fill"></i> 动漫清单</h3>
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <div class="p-3" style="background:rgba(255,255,255,.6); border-radius:12px;">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <span class="anime-badge">在看</span>
+                                <span class="anime-badge" style="background:#ffcc00; color:#333;">评分 8.6</span>
+                            </div>
+                            <div class="mt-2 fw-bold">风灵玉秀 II</div>
+                            <div class="text-muted" style="font-size:.95rem;">画面惊艳，国风奇幻氛围拉满。</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="p-3" style="background:rgba(255,255,255,.6); border-radius:12px;">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <span class="anime-badge">重温</span>
+                                <span class="anime-badge" style="background:#ffcc00; color:#333;">评分 9.0</span>
+                            </div>
+                            <div class="mt-2 fw-bold">关于我转生变成史莱姆这件事</div>
+                            <div class="text-muted" style="font-size:.95rem;">设定轻松治愈，世界观扩展有趣。</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="p-3" style="background:rgba(255,255,255,.6); border-radius:12px;">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <span class="anime-badge">想补</span>
+                                <span class="anime-badge" style="background:#ffcc00; color:#333;">期待值 8.8</span>
+                            </div>
+                            <div class="mt-2 fw-bold">丹特丽安的书架</div>
+                            <div class="text-muted" style="font-size:.95rem;">文学气息浓厚，设定独特。</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+                    pages.forEach(page => page.classList.remove('active'));
+                    
+                    // 获取目标页面ID
+                    const targetId = this.getAttribute('href').substring(1);
+                    const targetPage = document.getElementById(targetId + '-page');
+                    
+                    // 显示目标页面
+                    if(targetPage) {
+                        targetPage.classList.add('active');
+                    }
+                    
+                    // 滚动到顶部
+                    window.scrollTo(0, 0);
+                });
+            });
+        });
+    </script>
+</head>
+
+<body id="page-top">
+    <!-- Navigation-->
+    <nav class="header navbar navbar-expand-lg navbar-light fixed-top shadow-sm" id="mainNav">
+        <div class="container px-5">
+            <a class="navbar-brand fw-bold" href="#page-top">量子魔法使</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive"
+                aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+                MENU
+                <i class="bi-list"></i>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarResponsive">
+                <ul class="navbar-nav ms-auto me-4 my-3 my-lg-0">
+                    <li class="nav-item">
+                        <a class="nav-link me-lg-3" href="#home">首页</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link me-lg-3" href="#research">研究</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link me-lg-3" href="#anime">娱乐</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link me-lg-3" href="#publications">论文</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link me-lg-3" href="#contact">联系</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Top Section -->
+    <section class="top-section">
+        <!-- 顶部横幅动图：将你的二次元GIF放到 static/assets/img/ 并改这里的 src 即可 -->
+        <img class="banner-img" src="static/assets/img/anime-banner.svg" alt="Top Banner">
+        <div class="top-section-content">
+            <div class="container px-5">
+                <h2 class="text-white display-3 lh-1 font-alt">无聊……</h2>
+            </div>
+        </div>
+    </section>
+    <!-- Top Section -->
+
+    <!-- Photo -->
+    <div class="container px-5">
+        <div id="avatar" class="float-animation">
+            <img class="shadow" src="static/assets/img/ZZZ.jpeg">
+        </div>
+        
+    </div>
+    <!-- Photo -->
+
+    <!-- Home Page -->
+    <section id="home-page" class="page">
+        <div class="container px-5">
+            <div class="row">
+                <div class="col-lg-8 mx-auto text-center">
+                    <h1> Moyu - aka [ 𝕮𝖔𝖉𝖊_𝖂𝖎𝖟𝖆𝖗𝖉𝖞 ] </h1>
+                    <p class="lead">量子魔法使 | 理论物理研究者 | 二次元爱好者</p>
+                    
+                    <div class="d-flex justify-content-center my-4">
+                        <a href="https://github.com/Taowayi" class="mx-2">
+                            <span class="anime-badge"><i class="bi bi-github"></i> GitHub</span>
+                        </a>
+                        <a href="https://twitter.com/Moyu" class="mx-2">
+                            <span class="anime-badge"><i class="bi bi-twitter"></i> Twitter</span>
+                        </a>
+                        <a href="https://space.bilibili.com/251781364" class="mx-2">
+                            <span class="anime-badge"><i class="bi bi-play-btn-fill"></i> Bilibili</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mt-5">
+                <div class="col-md-6">
+                    <div class="anime-card">
+                        <h3><i class="bi bi-mortarboard-fill"></i> 教育背景</h3>
+                        <ul>
+                            <!-- <li><strong>XX大学</strong> - 理论物理博士 (2023-至今)</li>
+                            <li><strong>XX大学</strong> - 物理学硕士 (2020-2023)</li>
+                            <li><strong>XX大学</strong> - 物理学学士 (2016-2020)</li> -->
+                            <li><strong>YZU</strong> - Master (2023-now)</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="anime-card">
+                        <h3><i class="bi bi-award-fill"></i> 荣誉奖项</h3>
+                        <ul>
+                            <!-- <li>国家奖学金 (2022)</li>
+                            <li>校级优秀毕业生 (2020)</li>
+                            <li>物理竞赛一等奖 (2019)</li> -->
+                            <li>NONONO</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="anime-card">
+                        <h3><i class="bi bi-heart-fill"></i> 研究兴趣</h3>
+                        <p>我的研究主要集中在粒子物理和天文的交叉领域：</p>
+                        <div class="d-flex flex-wrap">
+                            <span class="anime-badge my-1">中子星</span>
+                            <span class="anime-badge my-1">状态方程</span>
+                        </div>
+                    </div>
+                    
+                    <div class="anime-card">
+                        <h3><i class="bi bi-music-note-beamed"></i> 近期爱好</h3>
+                        <ul>
+                            <li>弹吉他玩玩</li>
+                            <li>追番</li>
+                            <li>参加动漫展会</li>
+                            <li>开发二次元风格物理模拟器</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </section>
+    <!-- Home Page -->
+
+    <!-- Research Page -->
+    <section id="research-page" class="page">
+        <div class="container px-5">
+            <h2><i class="bi bi-search"></i> 研究领域</h2>
+            
+            <!-- <div class="anime-card">
+                <h3>量子引力与全息原理</h3>
+                <p>探索AdS/CFT对偶在量子引力理论中的应用，特别是研究黑洞信息悖论和时空涌现的机制。</p>
+                <p>近期工作聚焦于：</p>
+                <ul>
+                    <li>量子混沌与全息对偶</li>
+                    <li>ER=EPR猜想</li>
+                    <li>量子纠错码与时空结构</li>
+                </ul>
+            </div> -->
+            
+            <div class="anime-card">
+                <h3>中子星物态方程</h3>
+                <p>研究中子星内部的极端条件下的物质状态，天体物理观测数据。</p>
+                <p>主要方法：</p>
+                <ul>
+                    <li>RMF相对论平均场</li>
+                    <!-- <li>有效场论模型</li> -->
+                    <li>多信使天文学数据分析</li>
+                </ul>
+            </div>
+            
+            <!-- <div class="anime-card">
+                <h3>数学物理</h3>
+                <p>研究可积系统、共形场论和拓扑量子场论中的数学结构。</p>
+                <p>当前兴趣：</p>
+                <ul>
+                    <li>顶点算子代数</li>
+                    <li>模形式与量子场论</li>
+                    <li>范畴论在物理中的应用</li>
+                </ul>
+            </div> -->
+        </div>
+    </section>
+    <!-- Research Page -->
+
+    <!-- Anime Page -->
+    <section id="anime-page" class="page">
+        <div class="container px-5">
+            <h2><i class="bi bi-joystick"></i> 二次元世界</h2>
+            
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="anime-card h-100">
+                        <h3><i class="bi bi-collection-play-fill"></i> 最爱动画</h3>
+                        <ul>
+                            <li>《关于我转生变成史莱姆这件事》</li>
+                            <li>《丹特丽安的书架》</li>
+                            <li>《风灵玉秀》</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="anime-card h-100">
+                        <h3><i class="bi bi-book-half"></i> 二次元创作</h3>
+                        <ul>
+                            <li>植物大战僵尸</li>
+                            <li>三国杀</li>
+                            <li>动漫剪辑</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="anime-card h-100">
+                        <h3><i class="bi bi-music-note-list"></i> 同人音乐</h3>
+                        <ul>
+                            <li>暂无</li>
+                        </ul>
+                        <p>在Bilibili和网易云音乐发布</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="anime-card mt-4">
+                <h3><i class="bi bi-star-fill"></i> 我的B站数据</h3>
+                <div align="center">
+                    <img src="static/assets/img/Muse.png" alt="B站数据" style="max-width: 50%; max-height: 300px;" />
+                </div>
+                <div class="mt-3">
+                    <p>
+                        <a href="https://space.bilibili.com/251781364" target="_blank">
+                            <img src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fapi.bilibili.com%2Fx%2Frelation%2Fstat%3Fvmid%3D251781364&query=data.follower&label=粉丝&color=FB7299&logo=bilibili&logoColor=white&style=for-the-badge" alt="B站粉丝">
+                        </a>
+                        <a href="#" target="_blank">
+                            <img src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fapi.bilibili.com%2Fx%2Fspace%2Fupstat%3Fmid%3D251781364&query=data.likes&label=获赞&color=FF6699&style=for-the-badge" alt="获赞数">
+                        </a>
+                    </p>
+                </div>
+            </div>
+
+            <div class="anime-card mt-4">
+                <h3><i class="bi bi-tv"></i> 最近在看</h3>
+                <p>
+                    <a href="https://www.bilibili.com/bangumi/play/ss6038?spm_id_from=333.337.0.0" target="_blank">
+                        <img src="https://img.shields.io/badge/《风灵玉秀》-第二季热播中-FF69B4?style=for-the-badge&logo=bilibili" alt="风灵玉秀">
+                    </a>
+                    <a href="https://www.bilibili.com/bangumi/play/ss48852?spm_id_from=333.1387.0.0" target="_blank">
+                        <img src="https://img.shields.io/badge/《转生史莱姆》-第三季制作决定-FB7299?style=for-the-badge&logo=bilibili" alt="关于我转生变成史莱姆这档事">
+                    </a>
+                    <a href="https://www.bilibili.com/video/BV1VV411e7Wr/?spm_id_from=333.1387.0.0" target="_blank">
+                        <img src="https://img.shields.io/badge/丹特丽安-剪辑-161B33?style=for-the-badge&logo=atom&logoColor=white" alt="中子星物理">
+                    </a>
+                </p>
+            </div>
+
+            <!-- New: 动漫清单 + 评分/一句话评语 -->
+            <div class="anime-card mt-4">
+                <h3><i class="bi bi-collection-play-fill"></i> 动漫清单</h3>
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <div class="p-3" style="background:rgba(255,255,255,.6); border-radius:12px;">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <span class="anime-badge">在看</span>
+                                <span class="anime-badge" style="background:#ffcc00; color:#333;">评分 8.6</span>
+                            </div>
+                            <div class="mt-2 fw-bold">风灵玉秀 II</div>
+                            <div class="text-muted" style="font-size:.95rem;">画面惊艳，国风奇幻氛围拉满。</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="p-3" style="background:rgba(255,255,255,.6); border-radius:12px;">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <span class="anime-badge">重温</span>
+                                <span class="anime-badge" style="background:#ffcc00; color:#333;">评分 9.0</span>
+                            </div>
+                            <div class="mt-2 fw-bold">关于我转生变成史莱姆这件事</div>
+                            <div class="text-muted" style="font-size:.95rem;">设定轻松治愈，世界观扩展有趣。</div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="p-3" style="background:rgba(255,255,255,.6); border-radius:12px;">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <span class="anime-badge">想补</span>
+                                <span class="anime-badge" style="background:#ffcc00; color:#333;">期待值 8.8</span>
+                            </div>
+                            <div class="mt-2 fw-bold">丹特丽安的书架</div>
+                            <div class="text-muted" style="font-size:.95rem;">文学气息浓厚，设定独特。</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- (已恢复至合并前的结构；如需移除游戏进度，可再次告知) -->
+
+            <!-- New: 音乐播放清单（来自本地music目录） -->
+            <div class="anime-card mt-4">
+                <h3><i class="bi bi-music-note-list"></i> 本地音乐清单</h3>
+                <ul class="mb-0">
+                    <li>神のまにまに — Sou / いすぼくろ / ウォルピスカーター</li>
+                    <li>老人と海 — ヨルシカ</li>
+                    <li>強風オールバック — 歌愛ユキ / ゆこぴ</li>
+                </ul>
+                <div class="mt-2 text-muted" style="font-size:.95rem;">点击左下角 🎵 按钮打开播放器，支持拖拽与关闭。</div>
+            </div>
+        </div>
+    </section>
+    <!-- Anime Page -->
+
+    <!-- Publications Page -->
+    <section id="publications-page" class="page">
+        <div class="container px-5">
+            <h2><i class="bi bi-file-text-fill"></i> 学术论文</h2>
+            <div class="mb-3">
+                <a href="https://inspirehep.net/authors/2867836" target="_blank" class="anime-badge" style="text-decoration:none;">
+                    <i class="bi bi-link-45deg"></i> 我的 INSPIRE 主页
+                </a>
+            </div>
+            <div class="anime-card">
+                <h3>期刊论文</h3>
+                <li>
+                    <strong>暂无</strong>
+                </li>
+                <!-- <ul>
+                    
+                    <li>
+                        <strong>Moyu</strong>, "Holographic Quantum Error Correction in AdS/CFT", JHEP 2024
+                        <a href="#"><span class="anime-badge">PDF</span></a>
+                        <a href="#"><span class="anime-badge">arXiv</span></a>
+                    </li>
+                    <li>
+                        <strong>Moyu</strong> et al., "Neutron Star Equation of State from QCD", PRD 2023
+                        <a href="#"><span class="anime-badge">PDF</span></a>
+                    </li>
+                    <li>
+                        <strong>Moyu</strong>, "Anime-inspired Visualization of Quantum Phenomena", SciVis 2023
+                        <a href="#"><span class="anime-badge">PDF</span></a>
+                    </li>
+                </ul> -->
+            </div>
+            
+            <div class="anime-card">
+                <h3>会议报告</h3>
+                <ul>
+                    <li>"零温中子星状态方程", 2024</li>
+                    <!-- <li>"The Physics of Isekai Worlds", Comiket 2023</li>
+                    <li>"Magical Girls and Quantum Mechanics", ACG Academic Conference 2022</li> -->
+                </ul>
+            </div>
+            
+            <div class="anime-card">
+                <h3>科普作品</h3>
+                <ul>
+                    <li>暂无</li>
+                    <!-- <li>《魔法少女的弦理论指南》同人志，Comiket 2023</li>
+                    <li>《从Steins;Gate看时间旅行物理学》博客系列</li> -->
+                </ul>
+            </div>
+        </div>
+    </section>
+    <!-- Publications Page -->
+
+    <!-- Contact Page -->
+    <section id="contact-page" class="page">
+        <div class="container px-5">
+            <h2><i class="bi bi-envelope-fill"></i> 联系我</h2>
+            
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="anime-card h-100">
+                        <h3>学术联系</h3>
+                        <p><i class="bi bi-envelope"></i> <strong>Email:</strong> 保密</p>
+                        <p><i class="bi bi-building"></i> <strong>地址:</strong> 物理学院，YZU</p>
+                        <p><i class="bi bi-building"></i> <strong>地址:</strong> 物理学院，YZU</p>
+                        <!-- <p><i class="bi bi-telephone"></i> <strong>电话:</strong> +81-XXX-XXXX-XXXX</p> -->
+                        
+                        <h4 class="mt-4">合作机会</h4>
+                        <p>欢迎对以下方向有兴趣的研究者联系：</p>
+                        <ul>
+                            <li>中子星状态方程</li>
+                            <!-- <li>科学可视化项目</li>
+                            <li>跨学科艺术科学项目</li> -->
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="col-md-6">
+                    <div class="anime-card h-100">
+                        <h3>二次元联系</h3>
+                        <p><i class="bi bi-twitter"></i> <strong>Twitter:</strong> NNN</p>
+                        <p><i class="bi bi-play-btn"></i> <strong>Bilibili:</strong> 贾大爷看了想乱舞</p>
+                        <p><i class="bi bi-discord"></i> <strong>Discord:</strong> NNN</p>
+                        
+                        <h4 class="mt-4">同人活动</h4>
+                        <p>参加以下活动时可以找到我：</p>
+                        <ul>
+                            <li>Comiket (夏季/冬季)</li>
+                            <li>中国国际动漫节</li>
+                            <li>漫展</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="anime-card mt-4">
+                <h3>留言板</h3>
+                <form>
+                    <div class="mb-3">
+                        <label for="name" class="form-label">姓名</label>
+                        <input type="text" class="form-control" id="name">
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">邮箱</label>
+                        <input type="email" class="form-control" id="email">
+                    </div>
+                    <div class="mb-3">
+                        <label for="message" class="form-label">留言内容</label>
+                        <textarea class="form-control" id="message" rows="3"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="background-color: var(--primary-color); border: none;">发送</button>
+                </form>
+            </div>
+        </div>
+    </section>
+    <!-- Contact Page -->
+
+    <!-- Footer-->
+    <footer class="bg-bottom text-center py-5">
+        <div class="container px-5 d-flex justify-content-between align-items-center">
+            <div class="text-white-50 small">
+                <div class="mb-2">&copy; Moyu 2025-∞. 保留所有权利。</div>
+                <a href="https://github.com/Taowayi">GitHub</a>
+                <!-- <span class="mx-1">&middot;</span>
+                <a href="https://twitter.com/QuantumMoyu">Twitter</a> -->
+                                <!-- <span class="mx-1">&middot;</span>
+                <a href="https://twitter.com/QuantumMoyu">Twitter</a> -->
+                <span class="mx-1">&middot;</span>
+                <a href="https://space.bilibili.com/251781364">Bilibili</a>
+            </div>
+<!-- 添加计数器 -->
+            <div id="visitor-counter" class="mt-3">
+                <img src="https://count.getloli.com/get/@Taowayi?theme=moebooru" alt="访问计数" />
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
