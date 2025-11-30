@@ -245,6 +245,31 @@
                     window.scrollTo(0, 0);
                 });
             });
+
+            // 论文页统计计算
+            const pubList = document.getElementById('pub-list');
+            if (pubList) {
+                const items = Array.from(pubList.querySelectorAll('li'));
+                const total = items.length;
+                const citations = items.reduce((sum, li) => {
+                    const c = parseInt(li.getAttribute('data-citations') || '0', 10);
+                    return sum + (isNaN(c) ? 0 : c);
+                }, 0);
+                const top = items
+                    .map(li => ({title: li.textContent.trim(), c: parseInt(li.getAttribute('data-citations') || '0', 10)}))
+                    .sort((a, b) => b.c - a.c)[0];
+
+                const pubTotalEl = document.getElementById('pub-total');
+                const citeTotalEl = document.getElementById('cite-total');
+                const topCiteEl = document.getElementById('top-cite');
+                const topTitleEl = document.getElementById('top-cite-title');
+                if (pubTotalEl) pubTotalEl.textContent = String(total);
+                if (citeTotalEl) citeTotalEl.textContent = String(citations);
+                if (top) {
+                    if (topCiteEl) topCiteEl.textContent = `${top.c}`;
+                    if (topTitleEl) topTitleEl.textContent = top.title;
+                }
+            }
         });
     </script>
 </head>
@@ -508,11 +533,40 @@
                     <i class="bi bi-link-45deg"></i> 我的 INSPIRE 主页
                 </a>
             </div>
+            <div class="row g-3 mb-3">
+                <div class="col-md-4">
+                    <div class="anime-card h-100">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <span class="fw-bold"><i class="bi bi-journal-text"></i> 文章数量</span>
+                            <span id="pub-total" class="anime-badge">0</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="anime-card h-100">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <span class="fw-bold"><i class="bi bi-quote"></i> 引用总数</span>
+                            <span id="cite-total" class="anime-badge">0</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="anime-card h-100">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <span class="fw-bold"><i class="bi bi-trophy-fill"></i> 最高引用</span>
+                            <span id="top-cite" class="anime-badge">—</span>
+                        </div>
+                        <div id="top-cite-title" class="mt-2 text-muted" style="font-size:.95rem;">—</div>
+                    </div>
+                </div>
+            </div>
             <div class="anime-card">
                 <h3>期刊论文</h3>
-                <li>
-                    <strong>暂无</strong>
-                </li>
+                <ul id="pub-list" class="mb-0">
+                    <li data-citations="12">示例论文 A：中子星致密物质约束研究 (2024)</li>
+                    <li data-citations="5">示例论文 B：强相互作用的有效场论 (2023)</li>
+                    <li data-citations="0">示例论文 C：数值方法与天文数据 (预印本)</li>
+                </ul>
             </div>
             
             <div class="anime-card">
