@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="300" viewBox="0 0 1600 300" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <!-- 白天主题：更暗一点的粉蓝、低对比 -->
+    <linearGradient id="grad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#d7e6f7"/>
+      <stop offset="60%" stop-color="#bcd3f2"/>
+      <stop offset="100%" stop-color="#ffd0df"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.8" cy="0.2" r="0.65">
+      <stop offset="0%" stop-color="#ffc6da" stop-opacity="0.22"/>
+      <stop offset="100%" stop-color="#ffc6da" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect x="0" y="0" width="1600" height="300" fill="url(#grad)"/>
+  <rect x="0" y="0" width="1600" height="300" fill="url(#glow)"/>
+  <!-- sparse soft stars -->
+  <g fill="#8aa6e8" opacity="0.5">
+    <circle cx="180" cy="50" r="1.2"/>
+    <circle cx="520" cy="80" r="1"/>
+    <circle cx="880" cy="40" r="1.1"/>
+    <circle cx="1200" cy="110" r="1.2"/>
+    <circle cx="1460" cy="60" r="1"/>
+  </g>
+  <!-- very subtle lines -->
+  <g stroke="#b8aaf2" stroke-opacity="0.2" fill="none" stroke-width="0.7">
+    <path d="M280 200 L320 194 L360 206"/>
+    <path d="M1000 180 L1030 172 L1060 185"/>
+  </g>
+</svg>

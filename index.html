@@ -59,7 +59,7 @@
         
         .top-section {
             position: relative;
-            height: 260px;
+            height: 300px;
             overflow: hidden;
         }
 
@@ -106,7 +106,17 @@
         
         section {
             padding: 60px 0;
-            border-bottom: 1px dashed #ccc;
+        }
+        /* 顶部与内容：直接过渡（无渐变叠层） */
+        /* 卡片顶部的轻微阴影，避免割裂 */
+        .anime-card { position: relative; }
+        .anime-card::before {
+            content: '';
+            position: absolute;
+            left: 0; right: 0; top: 0; height: 12px;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.06), rgba(0,0,0,0));
+            pointer-events: none;
+            border-top-left-radius: 10px; border-top-right-radius: 10px;
         }
         
         h2 {
@@ -114,6 +124,7 @@
             border-left: 5px solid var(--secondary-color);
             padding-left: 15px;
             margin-bottom: 30px;
+            font-family: 'Newsreader', serif;
         }
         
         .anime-card {
@@ -174,11 +185,71 @@
         footer a:hover {
             color: var(--secondary-color);
         }
+        /* MathJax SVG 样式与字体区分 */
+        .mjx-container { line-height: 1.1; }
+        .mjx-container svg { height: 1em; vertical-align: -0.2em; }
+        #pub-list .mjx-container svg { fill: currentColor; }
+
+        /* 图片灯箱 */
+        .lightbox-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.75);
+            display: none; align-items: center; justify-content: center;
+            z-index: 10000;
+        }
+        .lightbox-overlay.active { display: flex; }
+        .lightbox-content {
+            max-width: 90vw; max-height: 90vh; box-shadow: 0 10px 30px rgba(0,0,0,.4);
+            border-radius: 8px; overflow: hidden; background: #000;
+        }
+        .lightbox-content img { display: block; width: 100%; height: auto; }
+        .lightbox-close {
+            position: absolute; top: 16px; right: 20px; color: #fff;
+            font-size: 24px; cursor: pointer; user-select: none;
+        }
+
+        /* KPI 统计卡片样式 */
+        .kpi-card {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 18px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, rgba(106,90,205,0.08), rgba(255,105,180,0.08));
+            border: 1px solid rgba(106,90,205,0.25);
+        }
+        .kpi-icon {
+            width: 44px; height: 44px;
+            border-radius: 12px;
+            display:flex; align-items:center; justify-content:center;
+            background: linear-gradient(135deg, #6a5acd, #a78bfa);
+            color: #fff;
+            box-shadow: 0 6px 16px rgba(106,90,205,0.35);
+            font-size: 1.2rem;
+        }
+        .kpi-text { flex: 1; }
+        .kpi-label { font-size: .9rem; color: #666; }
+        .kpi-value { font-size: 1.6rem; font-weight: 700; color: #2e2e3a; }
+        .kpi-sub { font-size: .85rem; color: #888; }
         
         /* 分页样式 */
         .page {
             display: none;
         }
+                /* 夜间模式 */
+                body.dark-mode {
+                    background-color: #0f172a;
+                    color: #e5e7eb;
+                }
+                body.dark-mode .header { background-color: #0b1220 !important; border-bottom-color: #a78bfa; }
+                body.dark-mode .anime-card { background:#0b1220; border-color:#a78bfa33; box-shadow:none; }
+                body.dark-mode .anime-badge { background-color:#6a5acd; color:#fff; }
+                body.dark-mode h2 { color:#a78bfa; border-left-color:#ff69b4; }
+                /* 夜间模式下的页脚：更柔和的低对比蓝紫 */
+                body.dark-mode footer { background: linear-gradient(135deg, #0f172a 0%, #162238 50%, #1e2b46 100%); }
+                body.dark-mode #load-toast { background:#111827; color:#e5e7eb; border-color:#374151; }
+                body.dark-mode .kpi-card { background:linear-gradient(135deg, rgba(167,139,250,.08), rgba(251,113,133,.08)); border-color:#a78bfa55; }
+                body.dark-mode .kpi-value { color:#e5e7eb; }
+                body.dark-mode .mjx-container svg { fill: currentColor; }
         
         .page.active {
             display: block;
@@ -215,6 +286,21 @@
     <script src="static/js/music-player.js"></script>
     <script src="static/js/fun-widget.js"></script>
     <script src="static/js/interactive.js"></script>
+    <!-- 数学公式渲染（MathJax v3 TeX→SVG） -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [["$","$"],["\\(","\\)"]],
+                displayMath: [["$$","$$"],["\\[","\\]"]],
+                processEscapes: true,
+                processEnvironments: true
+            },
+            options: {
+                skipHtmlTags: {"tags": ["script","noscript","style","textarea","pre","code"]}
+            },
+        };
+    </script>
+    <script src="static/js/tex-svg.js"></script>
 
     <script>
         // 页面导航逻辑
@@ -246,30 +332,315 @@
                 });
             });
 
-            // 论文页统计计算
-            const pubList = document.getElementById('pub-list');
-            if (pubList) {
-                const items = Array.from(pubList.querySelectorAll('li'));
-                const total = items.length;
-                const citations = items.reduce((sum, li) => {
-                    const c = parseInt(li.getAttribute('data-citations') || '0', 10);
-                    return sum + (isNaN(c) ? 0 : c);
-                }, 0);
-                const top = items
-                    .map(li => ({title: li.textContent.trim(), c: parseInt(li.getAttribute('data-citations') || '0', 10)}))
-                    .sort((a, b) => b.c - a.c)[0];
-
+            // 论文页统计计算 - 从 INSPIRE API 拉取
+            (async () => {
+                const authorRecid = 2867836; // Taowayi 的 INSPIRE 作者ID
+                const pubListEl = document.getElementById('pub-list');
+                const hintEl = document.getElementById('pub-hint');
                 const pubTotalEl = document.getElementById('pub-total');
                 const citeTotalEl = document.getElementById('cite-total');
                 const topCiteEl = document.getElementById('top-cite');
                 const topTitleEl = document.getElementById('top-cite-title');
-                if (pubTotalEl) pubTotalEl.textContent = String(total);
-                if (citeTotalEl) citeTotalEl.textContent = String(citations);
-                if (top) {
-                    if (topCiteEl) topCiteEl.textContent = `${top.c}`;
-                    if (topTitleEl) topTitleEl.textContent = top.title;
+                const btnLatest = document.getElementById('sort-latest');
+                const btnCited = document.getElementById('sort-cited');
+                const avatarImg = document.querySelector('#avatar img');
+                const bannerImg = document.querySelector('.top-section .banner-img');
+                const lightbox = document.getElementById('lightbox');
+                const lightboxImg = document.getElementById('lightbox-img');
+                const lightboxClose = document.getElementById('lightbox-close');
+                const toastEl = document.getElementById('load-toast');
+                const toastText = document.getElementById('load-toast-text');
+                let items = [];
+                const monthPad = (m) => {
+                    if (!m) return '';
+                    const mm = String(m).padStart(2, '0');
+                    return mm;
+                };
+                const getJournalAbbrev = (title) => {
+                    if (!title) return '';
+                    const t = title.toLowerCase();
+                    // 常见期刊简写映射
+                    const map = [
+                        {k: ['physical review letters','phys. rev. lett.','prl'], v: 'PRL'},
+                        {k: ['physical review d','phys. rev. d','prd'], v: 'PRD'},
+                        {k: ['physical review c','phys. rev. c','prc'], v: 'PRC'},
+                        {k: ['journal of high energy physics','jhep'], v: 'JHEP'},
+                        {k: ['physics letters b','phys. lett. b','plb'], v: 'PLB'},
+                        {k: ['european physical journal c','epj c','epjc'], v: 'EPJC'},
+                        {k: ['classical and quantum gravity','cqg'], v: 'CQG'},
+                        {k: ['monthly notices of the royal astronomical society','mnras'], v: 'MNRAS'},
+                        {k: ['astrophysical journal','apj'], v: 'ApJ'},
+                        {k: ['nuclear physics a','nucl. phys. a','npa'], v: 'NPA'},
+                        {k: ['science'], v: 'Science'},
+                        {k: ['nature'], v: 'Nature'}
+                    ];
+                    for (const entry of map) {
+                        if (entry.k.some(s => t.includes(s))) return entry.v;
+                    }
+                    // 默认回退：取单词首字母，长度3-5
+                    const initials = title
+                        .replace(/[^a-zA-Z\s]/g, ' ')
+                        .trim()
+                        .split(/\s+/)
+                        .slice(0, 4)
+                        .map(w => w[0] ? w[0].toUpperCase() : '')
+                        .join('');
+                    return initials || '';
+                };
+
+                const renderList = (mode = 'latest') => {
+                    if (!pubListEl) return;
+                    pubListEl.innerHTML = '';
+                    const sorted = [...items];
+                    if (mode === 'cited') {
+                        sorted.sort((a,b) => b.cite - a.cite);
+                    } else {
+                        // 按最新发表年份降序，若缺年份按 earliest_date 推断
+                        sorted.sort((a,b) => {
+                            const ay = parseInt(a.year || '0', 10);
+                            const by = parseInt(b.year || '0', 10);
+                            return by - ay;
+                        });
+                    }
+                    sorted.forEach(it => {
+                        const li = document.createElement('li');
+                        const ym = it.yearMonth ? ` (${it.yearMonth})` : (it.year ? ` (${it.year})` : '');
+                        const j = it.journalShort ? ` · [${it.journalShort}]` : '';
+                        li.innerHTML = `${it.title}${ym}${j} — 引用 ${it.cite}`;
+                        if (it.link) {
+                            const a = document.createElement('a');
+                            a.href = it.link;
+                            a.target = '_blank';
+                            a.rel = 'noopener noreferrer';
+                            a.textContent = ' [链接]';
+                            li.appendChild(a);
+                        }
+                        pubListEl.appendChild(li);
+                    });
+                    if (window.MathJax && typeof window.MathJax.typesetPromise === 'function') {
+                        window.MathJax.typesetPromise([pubListEl]).catch(() => {});
+                    }
+                    // 更新按钮高亮
+                    if (btnLatest && btnCited) {
+                        if (mode === 'latest') {
+                            btnLatest.classList.add('btn-primary');
+                            btnLatest.classList.remove('btn-outline-primary');
+                            btnCited.classList.add('btn-outline-primary');
+                            btnCited.classList.remove('btn-primary');
+                        } else {
+                            btnCited.classList.add('btn-primary');
+                            btnCited.classList.remove('btn-outline-primary');
+                            btnLatest.classList.add('btn-outline-primary');
+                            btnLatest.classList.remove('btn-primary');
+                        }
+                    }
+                };
+
+                try {
+                    // 抓取作者文献数据（不指定排序，前端控制）
+                    const url = `https://inspirehep.net/api/literature?q=authors.recid:${authorRecid}&size=200`;
+                    const resp = await fetch(url);
+                    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+                    const data = await resp.json();
+                    const records = (data.hits && data.hits.hits) ? data.hits.hits : [];
+                    
+                    items = records.map(rec => {
+                        const meta = rec.metadata || {};
+                        let title = (meta.titles && meta.titles[0] && meta.titles[0].title) ? meta.titles[0].title : '(无标题)';
+                        // 将可能的 MathML 片段转换为 TeX（如 <math><mi>g</mi></math> -> $g$）
+                        const toTeX = (html) => {
+                            if (!html) return html;
+                            html = html.replace(/&amp;/g, '&');
+                            html = html.replace(/<math[^>]*>([\s\S]*?)<\/math>/gi, (m, inner) => {
+                                let text = inner
+                                    .replace(/<mi[^>]*>/gi, '')
+                                    .replace(/<mo[^>]*>/gi, '')
+                                    .replace(/<mn[^>]*>/gi, '')
+                                    .replace(/<mrow[^>]*>/gi, '')
+                                    .replace(/<\/(mi|mo|mn|mrow)>/gi, '')
+                                    .trim();
+                                return text ? `$${text}$` : m;
+                            });
+                            return html;
+                        };
+                        title = toTeX(title);
+                        const pubInfo = (meta.publication_info && meta.publication_info[0]) ? meta.publication_info[0] : {};
+                        const year = pubInfo.year ? pubInfo.year : (meta.earliest_date || '').slice(0,4);
+                        const month = pubInfo.month ? monthPad(pubInfo.month) : ((meta.earliest_date || '').slice(5,7));
+                        const yearMonth = (year && month) ? `${year}-${month}` : (year || '');
+                        const cite = typeof meta.citation_count === 'number' ? meta.citation_count : 0;
+                        const link = meta.links && meta.links[0] && meta.links[0].value ? meta.links[0].value : (meta.urls && meta.urls[0] && meta.urls[0].value ? meta.urls[0].value : undefined);
+                        const id = (meta.control_number || rec.id);
+                        const journalTitle = pubInfo.journal_title || (pubInfo.journal_title_abbrev || '');
+                        const docTypes = Array.isArray(meta.document_type) ? meta.document_type.map(dt => String(dt).toLowerCase()) : [];
+                        const hasArXiv = Array.isArray(meta.arxiv_eprints) ? meta.arxiv_eprints.length > 0 : false;
+                        const refereed = !!meta.refereed; // INSPIRE: refereed=true 表示同行评审已发表
+                        // 判定策略：优先使用 refereed
+                        // 已发表（refereed=true）即视为期刊文章，不标记为预印本
+                        // 否则，仅当明确标识为 preprint 或仅有 arXiv 且无期刊信息时标记为预印本
+                        const isPreprint = !refereed && (docTypes.includes('preprint') || (hasArXiv && !journalTitle));
+                        const journalShort = isPreprint ? 'Preprint' : getJournalAbbrev(journalTitle);
+                        return { title, year, yearMonth, cite, link, id, journalShort };
+                    });
+                    // 默认按最新展示
+                    renderList('latest');
+
+                    const total = items.length;
+                    const citations = items.reduce((s, it) => s + (isNaN(it.cite) ? 0 : it.cite), 0);
+                    const top = [...items].sort((a, b) => b.cite - a.cite)[0];
+                    if (pubTotalEl) pubTotalEl.textContent = String(total);
+                    if (citeTotalEl) citeTotalEl.textContent = String(citations);
+                    if (top) {
+                        if (topCiteEl) topCiteEl.textContent = String(top.cite);
+                        if (topTitleEl) {
+                            topTitleEl.innerHTML = `${top.title}${top.year ? ' ('+top.year+')' : ''}`;
+                            if (window.MathJax && typeof window.MathJax.typesetPromise === 'function') {
+                                window.MathJax.typesetPromise([topTitleEl]).catch(() => {});
+                            }
+                        }
+                        // 构建最近5年趋势微图：以每年发表的论文的引用数总和作为近似
+                                                const years = [...new Set(items.map(it => parseInt(it.year || '0',10)).filter(y=>y>0))].sort((a,b)=>b-a);
+                                                const latestYears = years.slice(0,5).reverse();
+                                                const byYear = latestYears.map(y => items.filter(it => parseInt(it.year||'0',10)===y).reduce((s,it)=>s+(isNaN(it.cite)?0:it.cite),0));
+                                                const nonZero = byYear.filter(v => v > 0);
+                                                const maxVal = Math.max(...(nonZero.length ? byYear : [1]));
+                                                const trendBox = document.getElementById('trend-mini');
+                                                if (trendBox) {
+                                                                const w = 60, h = 24; // 微折线尺寸
+                                                                const step = byYear.length > 1 ? w / (byYear.length - 1) : w;
+                                                        // 若全部为0，使用中线作为可见参考
+                                                        const defaultY = Math.round(h * 0.6);
+                                                        const pts = byYear.length > 0 ? byYear.map((v,i)=>({x: Math.round(i*step), y: Math.round(h - (h * (nonZero.length ? v : 0) / maxVal)) || defaultY})) : [{x:0,y:defaultY}];
+                                                                const path = pts.reduce((acc,p,idx)=> acc + (idx===0?`M${p.x},${p.y}`:` L${p.x},${p.y}`),'');
+                                                        const svg = `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                                                                <defs>
+                                                                    <linearGradient id="trendGrad" x1="0" y1="0" x2="0" y2="1">
+                                                                        <stop offset="0%" stop-color="#fb7185"/>
+                                                                        <stop offset="100%" stop-color="#ff69b4"/>
+                                                                    </linearGradient>
+                                                                </defs>
+                                                                        <path d="${path}" fill="none" stroke="url(#trendGrad)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                                                ${byYear.length<=1 ? `<circle cx="${pts[0].x}" cy="${pts[0].y}" r="2" fill="#fb7185"/>` : ''}
+                                                            </svg>`;
+                                                        trendBox.innerHTML = svg;
+                                                        // 确保可见
+                                                        const svgEl = trendBox.querySelector('svg');
+                                                        if (svgEl) { svgEl.style.display = 'block'; }
+                                                                trendBox.title = latestYears.length ? latestYears.map((y,i)=>`${y}:${byYear[i]||0}`).join(' | ') : '无趋势数据';
+                                                }
+                    }
+
+                    if (hintEl) hintEl.textContent = `已加载 ${total} 篇文献（数据源：INSPIRE）`;
+                    // 漂浮提醒胶囊：2秒淡出
+                    if (toastEl && toastText) {
+                        toastText.textContent = `已加载 ${total} 篇文献 / 引用总数 ${citations}`;
+                        toastEl.style.display = 'block';
+                        toastEl.style.opacity = '1';
+                        setTimeout(() => {
+                            toastEl.style.transition = 'opacity 0.6s ease';
+                            toastEl.style.opacity = '0';
+                            setTimeout(()=>{toastEl.style.display='none';}, 600);
+                        }, 2000);
+                    }
+
+                    // 绑定排序按钮
+                    if (btnLatest) btnLatest.addEventListener('click', () => renderList('latest'));
+                    if (btnCited) btnCited.addEventListener('click', () => renderList('cited'));
+                    // 夜间模式切换：点击头像
+                    const applyBannerTheme = () => {
+                        if (!bannerImg) return;
+                        const isDark = document.body.classList.contains('dark-mode');
+                        bannerImg.src = isDark ? 'static/assets/img/anime-banner-dark.svg' : 'static/assets/img/anime-banner-light.svg';
+                    };
+                                        // 图片灯箱：为卡片内图片绑定
+                                        // 图片灯箱：排除顶部横幅与头像
+                                        const cardImages = document.querySelectorAll('img:not(#avatar img):not(.top-section .banner-img)');
+                                        cardImages.forEach(img => {
+                                            img.style.cursor = 'zoom-in';
+                                            img.addEventListener('click', () => {
+                                                if (!lightbox || !lightboxImg) return;
+                                                lightboxImg.src = img.src;
+                                                lightbox.classList.add('active');
+                                            });
+                                        });
+                                        const closeLightbox = () => { if (lightbox) lightbox.classList.remove('active'); };
+                                        if (lightboxClose) lightboxClose.addEventListener('click', closeLightbox);
+                                        if (lightbox) lightbox.addEventListener('click', (e) => {
+                                            if (e.target === lightbox) closeLightbox();
+                                        });
+                                        window.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeLightbox(); });
+                    if (avatarImg) avatarImg.addEventListener('click', () => {
+                        document.body.classList.toggle('dark-mode');
+                        applyBannerTheme();
+                    });
+                    // 初次加载根据当前模式设定顶部背景
+                    applyBannerTheme();
+                } catch (err) {
+                    if (hintEl) hintEl.textContent = `INSPIRE 加载失败：${err.message}`;
                 }
-            }
+            })();
+
+            //（已回退）会议与科普数据外部加载逻辑移除，恢复静态列表
+
+            // 侧栏快速入口：拖拽与折叠状态持久化
+            (function() {
+                const box = document.getElementById('quick-sidebar');
+                const header = document.getElementById('qs-header');
+                const body = document.getElementById('qs-body');
+                const toggleBtn = document.getElementById('qs-toggle');
+                if (!box || !header || !body || !toggleBtn) return;
+
+                // 读取位置与折叠状态
+                const saved = JSON.parse(localStorage.getItem('quickSidebarState') || '{}');
+                if (typeof saved.right === 'number') box.style.right = saved.right + 'px';
+                if (typeof saved.bottom === 'number') box.style.bottom = saved.bottom + 'px';
+                const collapsed = !!saved.collapsed;
+                if (collapsed) {
+                    body.style.display = 'none';
+                    toggleBtn.textContent = '展开';
+                }
+
+                let dragging = false;
+                let startX = 0, startY = 0;
+                let startRight = 0, startBottom = 0;
+                header.addEventListener('mousedown', (e) => {
+                    dragging = true;
+                    startX = e.clientX;
+                    startY = e.clientY;
+                    // 当前right/bottom数值
+                    startRight = parseInt((box.style.right || '24px').replace('px',''), 10) || 24;
+                    startBottom = parseInt((box.style.bottom || '80px').replace('px',''), 10) || 80;
+                    document.body.style.userSelect = 'none';
+                });
+                window.addEventListener('mousemove', (e) => {
+                    if (!dragging) return;
+                    const dx = e.clientX - startX;
+                    const dy = e.clientY - startY;
+                    const newRight = Math.max(0, startRight - dx);
+                    const newBottom = Math.max(0, startBottom - dy);
+                    box.style.right = newRight + 'px';
+                    box.style.bottom = newBottom + 'px';
+                });
+                window.addEventListener('mouseup', () => {
+                    if (!dragging) return;
+                    dragging = false;
+                    document.body.style.userSelect = '';
+                    // 保存位置
+                    const state = JSON.parse(localStorage.getItem('quickSidebarState') || '{}');
+                    state.right = parseInt(box.style.right.replace('px',''), 10) || 24;
+                    state.bottom = parseInt(box.style.bottom.replace('px',''), 10) || 80;
+                    localStorage.setItem('quickSidebarState', JSON.stringify(state));
+                });
+
+                toggleBtn.addEventListener('click', () => {
+                    const isHidden = body.style.display === 'none';
+                    body.style.display = isHidden ? 'block' : 'none';
+                    toggleBtn.textContent = isHidden ? '折叠' : '展开';
+                    const state = JSON.parse(localStorage.getItem('quickSidebarState') || '{}');
+                    state.collapsed = !isHidden;
+                    localStorage.setItem('quickSidebarState', JSON.stringify(state));
+                });
+            })();
         });
     </script>
 </head>
@@ -308,8 +679,8 @@
 
     <!-- Top Section -->
     <section class="top-section">
-        <!-- 顶部横幅SVG图像 -->
-        <img class="banner-img" src="static/assets/img/anime-banner.svg" alt="Top Banner">
+        <!-- 顶部背景：渐变+星点自适应SVG -->
+        <img class="banner-img" src="static/assets/img/anime-banner-light.svg" alt="Top Background">
         <div class="top-section-content">
             <div class="container px-5">
                 <h2 class="text-white display-3 lh-1 font-alt">无聊……</h2>
@@ -535,38 +906,49 @@
             </div>
             <div class="row g-3 mb-3">
                 <div class="col-md-4">
-                    <div class="anime-card h-100">
-                        <div class="d-flex align-items-center justify-content-between">
-                            <span class="fw-bold"><i class="bi bi-journal-text"></i> 文章数量</span>
-                            <span id="pub-total" class="anime-badge">0</span>
+                    <div class="kpi-card">
+                        <div class="kpi-icon"><i class="bi bi-journal-text"></i></div>
+                        <div class="kpi-text">
+                            <div class="kpi-label">文章数量</div>
+                            <div class="kpi-value" id="pub-total">0</div>
+                            <div class="kpi-sub">包含期刊、预印本与会议论文</div>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="anime-card h-100">
-                        <div class="d-flex align-items-center justify-content-between">
-                            <span class="fw-bold"><i class="bi bi-quote"></i> 引用总数</span>
-                            <span id="cite-total" class="anime-badge">0</span>
+                    <div class="kpi-card">
+                        <div class="kpi-icon" style="background:linear-gradient(135deg,#ff69b4,#fb7185)"><i class="bi bi-quote"></i></div>
+                        <div class="kpi-text">
+                            <div class="kpi-label">引用总数</div>
+                            <div class="kpi-value" id="cite-total">0</div>
+                            <div class="kpi-sub">基于 INSPIRE 引用统计</div>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-4">
-                    <div class="anime-card h-100">
-                        <div class="d-flex align-items-center justify-content-between">
-                            <span class="fw-bold"><i class="bi bi-trophy-fill"></i> 最高引用</span>
-                            <span id="top-cite" class="anime-badge">—</span>
+                    <div class="kpi-card">
+                        <div class="kpi-icon" style="background:linear-gradient(135deg,#6ee7b7,#34d399)"><i class="bi bi-trophy-fill"></i></div>
+                        <div class="kpi-text" style="flex:1;">
+                            <div class="kpi-label">最高引用</div>
+                            <div class="d-flex align-items-center justify-content-between">
+                                <div class="kpi-value" id="top-cite">—</div>
+                                <div id="trend-mini" class="ms-3" style="display:flex; align-items:flex-end; gap:4px; height:24px;"></div>
+                            </div>
+                            <div id="top-cite-title" class="kpi-sub">—</div>
                         </div>
-                        <div id="top-cite-title" class="mt-2 text-muted" style="font-size:.95rem;">—</div>
                     </div>
                 </div>
             </div>
             <div class="anime-card">
                 <h3>期刊论文</h3>
-                <ul id="pub-list" class="mb-0">
-                    <li data-citations="12">示例论文 A：中子星致密物质约束研究 (2024)</li>
-                    <li data-citations="5">示例论文 B：强相互作用的有效场论 (2023)</li>
-                    <li data-citations="0">示例论文 C：数值方法与天文数据 (预印本)</li>
-                </ul>
+                <div class="d-flex align-items-center justify-content-start mb-2">
+                    <div class="btn-group btn-group-sm" role="group" aria-label="sort-controls">
+                        <button class="btn btn-outline-primary" id="sort-latest">按最新</button>
+                        <button class="btn btn-outline-primary" id="sort-cited">按引用</button>
+                    </div>
+                </div>
+                <ul id="pub-list" class="mb-0"></ul>
+                <div id="pub-hint" class="text-muted mt-2" style="font-size:.95rem;">正在从 INSPIRE 加载数据…</div>
             </div>
             
             <div class="anime-card">
@@ -585,6 +967,20 @@
         </div>
     </section>
     <!-- Publications Page -->
+
+    <!-- Night Mode Toggle & Notification Capsule -->
+    
+    <div id="load-toast" class="shadow" style="position:fixed; right:24px; top:24px; z-index:9999; background:#fff; color:#333; border:1px solid rgba(0,0,0,.08); border-radius:999px; padding:8px 14px; display:none;">
+        <span id="load-toast-text">已加载</span>
+    </div>
+
+    <!-- Image Lightbox Overlay -->
+    <div id="lightbox" class="lightbox-overlay" aria-hidden="true">
+        <div class="lightbox-close" id="lightbox-close" title="关闭">×</div>
+        <div class="lightbox-content">
+            <img id="lightbox-img" alt="预览" />
+        </div>
+    </div>
 
     <!-- Contact Page -->
     <section id="contact-page" class="page">

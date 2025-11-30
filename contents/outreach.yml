@@ -1,0 +1,15 @@
+# Outreach and Popular Science
+# Edit this file to update outreach items without changing code.
+# Fields: title, platform, date (YYYY-MM-DD), link (optional), type (article|video|podcast|other)
+items:
+  - title: Why the night sky sparkles: a guide to starlight
+    platform: WeChat Official Account
+    date: 2025-10-12
+    link: https://example.com/outreach/starlight
+    type: article
+  - title: The music of the cosmos
+    platform: Bilibili
+    date: 2025-08-20
+    link: https://www.bilibili.com/video/BV1234567890
+    type: video
+}  

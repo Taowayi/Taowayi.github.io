@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="300" viewBox="0 0 1600 300" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <!-- 深色主题：低对比蓝紫 -->
+    <linearGradient id="grad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="55%" stop-color="#1b2540"/>
+      <stop offset="100%" stop-color="#2a3458"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.78" cy="0.22" r="0.6">
+      <stop offset="0%" stop-color="#a78bfa" stop-opacity="0.22"/>
+      <stop offset="100%" stop-color="#a78bfa" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect x="0" y="0" width="1600" height="300" fill="url(#grad)"/>
+  <rect x="0" y="0" width="1600" height="300" fill="url(#glow)"/>
+  <!-- sparse stars -->
+  <g fill="#e5e7eb" opacity="0.8">
+    <circle cx="200" cy="60" r="1"/>
+    <circle cx="600" cy="40" r="1.1"/>
+    <circle cx="980" cy="90" r="1"/>
+    <circle cx="1320" cy="50" r="1.1"/>
+  </g>
+  <!-- very subtle lines -->
+  <g stroke="#a78bfa" stroke-opacity="0.18" fill="none" stroke-width="0.6">
+    <path d="M280 200 L320 194 L360 206"/>
+    <path d="M1040 180 L1070 174 L1100 186"/>
+  </g>
+</svg>
