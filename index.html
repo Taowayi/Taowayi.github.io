@@ -807,6 +807,23 @@
             background: #292524;
             color: #e5e7eb;
         }
+        .visitor-id-guild-count {
+            font-size: 1.7rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #fbbf24, #f59e0b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            filter: drop-shadow(0 2px 6px rgba(251, 191, 36, 0.3));
+        }
+        .visitor-id-counter-image {
+            display: block;
+            max-width: 200px;
+            width: 100%;
+            height: auto;
+            position: relative;
+            z-index: 0;
+        }
     </style>
 
     <!-- JavaScript -->
@@ -969,100 +986,68 @@
 
     <script>
         (function () {
-            const totalKey = 'visitorBadgeProfileTotal_v3';
-            const dateKey = 'visitorBadgeDate_v5';
-            const imageKey = 'visitorBadgeCached_v5';
+            var dateKey  = 'visitorBadgeDate_v9';
+            var totalKey = 'visitorBadgeProfileTotal_v5';
+            var countBase = 'https://count.getloli.com/get/@Taowayi-guild-v2?theme=asoul';
 
-            const today = (() => {
-                const now = new Date();
-                const year = now.getFullYear();
-                const month = String(now.getMonth() + 1).padStart(2, '0');
-                const day = String(now.getDate()).padStart(2, '0');
-                return `${year}-${month}-${day}`;
+            var today = (function () {
+                var now = new Date();
+                return now.getFullYear() + '-' +
+                    String(now.getMonth() + 1).padStart(2, '0') + '-' +
+                    String(now.getDate()).padStart(2, '0');
             })();
 
-            const totalEl = document.getElementById('visitor-total');
-            const todayEl = document.getElementById('visitor-today');
-            const statusEl = document.getElementById('visitor-status');
-            const rarityEl = document.getElementById('visitor-rarity');
-            const levelEl = document.getElementById('visitor-level');
-            const expTextEl = document.getElementById('visitor-exp-text');
-            const expFillEl = document.getElementById('visitor-exp-fill');
+            var totalEl = document.getElementById('visitor-total');
+            var todayEl = document.getElementById('visitor-today');
+            var statusEl = document.getElementById('visitor-status');
+            var rarityEl = document.getElementById('visitor-rarity');
+            var levelEl = document.getElementById('visitor-level');
+            var expTextEl = document.getElementById('visitor-exp-text');
+            var expFillEl = document.getElementById('visitor-exp-fill');
 
-            if (!totalEl || !todayEl || !statusEl || !rarityEl || !levelEl || !expTextEl || !expFillEl) {
-                return;
+            if (!totalEl || !todayEl || !statusEl || !rarityEl || !levelEl || !expTextEl || !expFillEl) return;
+
+            function renderBadge(localVisits, firstVisit, statusText) {
+                var epl = 7, level = Math.floor(localVisits / epl) + 1, exp = localVisits % epl;
+                var ranks = ['见习术士','青铜冒险者','白银探索者','黄金讨伐者','秘银旅人','传说勇者'];
+                var rank = ranks[Math.min(ranks.length - 1, Math.floor((level - 1) / 2))];
+                todayEl.textContent = firstVisit ? '委托达成' : '待命中';
+                statusEl.textContent = statusText;
+                rarityEl.textContent = localVisits >= 10 ? 'SSR' : localVisits >= 5 ? 'SR' : 'R';
+                levelEl.textContent = rank + ' Lv.' + String(level).padStart(2, '0');
+                expTextEl.textContent = exp + ' / ' + epl;
+                expFillEl.style.width = (exp / epl * 100) + '%';
             }
 
-            const renderBadge = (localVisits, firstVisitToday, sourceLabel, imgSrc) => {
-                const expPerLevel = 7;
-                const level = Math.floor(localVisits / expPerLevel) + 1;
-                const exp = localVisits % expPerLevel;
-                const expRate = Math.max(0, Math.min(100, (exp / expPerLevel) * 100));
-                const rankList = [
-                    '见习术士',
-                    '青铜冒险者',
-                    '白银探索者',
-                    '黄金讨伐者',
-                    '秘银旅人',
-                    '传说勇者'
-                ];
-                const rank = rankList[Math.min(rankList.length - 1, Math.floor((level - 1) / 2))];
-
-                if (imgSrc) totalEl.src = imgSrc;
-                todayEl.textContent = firstVisitToday ? '委托达成' : '待命中';
-                statusEl.textContent = sourceLabel;
-                rarityEl.textContent = localVisits >= 10 ? 'SSR' : localVisits >= 5 ? 'SR' : 'R';
-                levelEl.textContent = `${rank} Lv.${String(level).padStart(2, '0')}`;
-                expTextEl.textContent = `${exp} / ${expPerLevel}`;
-                expFillEl.style.width = `${expRate}%`;
-            };
-
             try {
-                // 清理旧版缓存，从头开始计数
-                ['visitorBadgeTotal_v1', 'visitorBadgeDate_v1', 'visitorBadgeDate_v2',
-                 'visitorBadgeGlobalImage_v1', 'visitorBadgeGlobalImage_v2',
-                 'visitorBadgeProfileTotal_v1'].forEach(function (k) {
-                    localStorage.removeItem(k);
-                });
-
-                const storedDate = localStorage.getItem(dateKey);
-                const firstVisitToday = storedDate !== today;
-                let localVisits = parseInt(localStorage.getItem(totalKey) || '0', 10);
-
-                if (!Number.isFinite(localVisits) || localVisits < 0) {
-                    localVisits = 0;
+                // 清旧缓存
+                for (var i = 0; i < localStorage.length; i++) {
+                    var k = localStorage.key(i);
+                    if (k && k.indexOf('visitorBadge') === 0) localStorage.removeItem(k);
                 }
 
-                const countBase = 'https://count.getloli.com/get/@Taowayi-guild?theme=asoul';
-                const countUrl = countBase + '&v=' + today;
+                var storedDate = localStorage.getItem(dateKey);
+                var firstVisitToday = storedDate !== today;
+                var localVisits = parseInt(localStorage.getItem(totalKey) || '0', 10);
+                if (!Number.isFinite(localVisits) || localVisits < 0) localVisits = 0;
+
+                // 图片每次都加载 count.getloli.com（服务器决定了加载=计数）
+                totalEl.src = countBase + '&v=' + today;
 
                 if (!firstVisitToday) {
-                    totalEl.src = localStorage.getItem(imageKey) || countUrl;
                     renderBadge(localVisits, false, '待命中');
                     return;
                 }
 
-                // 当日首访：加载计数图 + 缓存 URL，当天不再变
                 localVisits += 1;
                 localStorage.setItem(totalKey, String(localVisits));
                 localStorage.setItem(dateKey, today);
-
-                var ping = new Image();
-                ping.onload = function () {
-                    totalEl.src = countUrl;
-                    localStorage.setItem(imageKey, countUrl);
-                    renderBadge(localVisits, true, '报到完了');
-                };
-                ping.onerror = function () {
-                    totalEl.src = localStorage.getItem(imageKey) || countUrl;
-                    renderBadge(localVisits, true, '单人探索');
-                };
-                ping.src = countUrl;
-            } catch (error) {
-                var fallback = parseInt(localStorage.getItem(totalKey) || '1', 10);
-                if (!Number.isFinite(fallback) || fallback < 0) fallback = 1;
-                totalEl.src = localStorage.getItem(imageKey) || '';
-                renderBadge(fallback, true, '单人探索');
+                renderBadge(localVisits, true, '报到完了');
+            } catch (e) {
+                var fb = parseInt(localStorage.getItem(totalKey) || '1', 10);
+                if (!Number.isFinite(fb) || fb < 0) fb = 1;
+                totalEl.src = countBase + '&v=' + today;
+                renderBadge(fb, true, '单人探索');
             }
         })();
     </script>
