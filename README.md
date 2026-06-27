@@ -39,18 +39,20 @@ Simply open `index.html` in your browser to preview the homepage.
 
 ### 内容编辑 | Content Editing
 
-所有内容均以 Markdown 格式存储在 `contents/` 目录下：
-- `home.md` - 首页内容
-- `experience.md` - 工作经历
-- `publications.md` - 发表论文
-- `awards.md` - 获奖情况
+页面内容已拆分为 HTML 片段，位于 `contents/pages/` 目录下：
+- `home.html` - 首页内容
+- `research.html` - 研究领域
+- `anime.html` - 近期爱好
+- `publications.html` - 发表论文
+- `contact.html` - 联系方式
 - `config.yml` - 网站配置（标题、版权等）
 
-All content is stored in Markdown format in the `contents/` directory:
-- `home.md` - Homepage content
-- `experience.md` - Work experience
-- `publications.md` - Publications
-- `awards.md` - Awards
+Page content is now split into HTML fragments under `contents/pages/`:
+- `home.html` - Homepage content
+- `research.html` - Research area
+- `anime.html` - Recent hobbies
+- `publications.html` - Publications
+- `contact.html` - Contact info
 - `config.yml` - Website configuration (title, copyright, etc.)
 
 ### 自定义样式 | Customization

@@ -1,0 +1,71 @@
+<section id="publications-page" class="page">
+    <div class="container px-5">
+        <h2><i class="bi bi-file-text-fill"></i> 学术论文</h2>
+        <div class="mb-3">
+            <a href="https://inspirehep.net/authors/2867836" target="_blank" class="anime-badge" style="text-decoration:none;">
+                <i class="bi bi-link-45deg"></i> 我的 INSPIRE 主页
+            </a>
+        </div>
+        <div class="row g-3 mb-3">
+            <div class="col-md-4">
+                <div class="kpi-card">
+                    <div class="kpi-icon"><i class="bi bi-journal-text"></i></div>
+                    <div class="kpi-text">
+                        <div class="kpi-label">文章数量</div>
+                        <div class="kpi-value" id="pub-total">0</div>
+                        <div class="kpi-sub">包含期刊、预印本与会议论文</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="kpi-card">
+                    <div class="kpi-icon" style="background:linear-gradient(135deg,#ff69b4,#fb7185)"><i class="bi bi-quote"></i></div>
+                    <div class="kpi-text">
+                        <div class="kpi-label">引用总数</div>
+                        <div class="kpi-value" id="cite-total">0</div>
+                        <div class="kpi-sub">基于 INSPIRE 引用统计</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="kpi-card">
+                    <div class="kpi-icon" style="background:linear-gradient(135deg,#6ee7b7,#34d399)"><i class="bi bi-trophy-fill"></i></div>
+                    <div class="kpi-text" style="flex:1;">
+                        <div class="kpi-label">最高引用</div>
+                        <div class="d-flex align-items-center justify-content-between">
+                            <div class="kpi-value" id="top-cite">—</div>
+                            <div id="trend-mini" class="ms-3" style="display:flex; align-items:flex-end; gap:4px; height:24px;"></div>
+                        </div>
+                        <div id="top-cite-title" class="kpi-sub">—</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="anime-card">
+            <h3>期刊论文</h3>
+            <div class="d-flex align-items-center justify-content-start mb-2">
+                <div class="btn-group btn-group-sm" role="group" aria-label="sort-controls">
+                    <button class="btn btn-outline-primary" id="sort-latest">按最新</button>
+                    <button class="btn btn-outline-primary" id="sort-cited">按引用</button>
+                </div>
+            </div>
+            <ul id="pub-list" class="mb-0"></ul>
+            <div id="pub-hint" class="text-muted mt-2" style="font-size:.95rem;">正在从 INSPIRE 加载数据…</div>
+        </div>
+        
+        <div class="anime-card">
+            <h3>会议报告</h3>
+            <ul>
+                <li>"零温中子星状态方程", 2024</li>
+                <li>QCS 日本 2026</li>
+            </ul>
+        </div>
+        
+        <div class="anime-card">
+            <h3>科普作品</h3>
+            <ul>
+                <li>暂无</li>
+            </ul>
+        </div>
+    </div>
+</section>

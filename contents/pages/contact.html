@@ -1,0 +1,65 @@
+<section id="contact-page" class="page">
+    <div class="container px-5">
+        <h2><i class="bi bi-journal-bookmark-fill"></i> 冒险者联络站</h2>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="anime-card h-100">
+                    <h3>🏰 学术塔</h3>
+                    <p><i class="bi bi-envelope"></i> <strong>魔法信使:</strong> 保密</p>
+                    <p><i class="bi bi-geo-alt-fill"></i> <strong>据点:</strong> 物理学院, YZU</p>
+
+                    <h4 class="mt-4">🔬 联合任务募集</h4>
+                    <p>欢迎以下方向的研究者组成队伍：</p>
+                    <ul>
+                        <li>中子星状态方程</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="anime-card h-100">
+                    <h3>🎌 二次元酒馆</h3>
+                    <p><i class="bi bi-twitter"></i> <strong>冒险日志:</strong> NNN</p>
+                    <p><i class="bi bi-play-btn-fill"></i> <strong>传送门:</strong> 贾大爷看了想乱舞</p>
+                    <p><i class="bi bi-discord"></i> <strong>小队频道:</strong> NNN</p>
+
+                    <h4 class="mt-4">🎪 集会出没</h4>
+                    <p>以下集会可以捕捉到野生 Moyu：</p>
+                    <ul>
+                        <li>Comiket (夏/冬)</li>
+                        <li>中国国际动漫节</li>
+                        <li>各大漫展</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="anime-card mt-4" id="quest-board">
+            <h3>📜 委托留言板</h3>
+            <p class="text-muted mb-3">有事找我？填下表，信使会将委托送达工会邮箱。</p>
+            <form id="quest-form">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label for="name" class="form-label">冒险者名号</label>
+                        <input type="text" class="form-control" id="name" name="name" placeholder="例：路过的勇者" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="email" class="form-label">魔法信标 (邮箱)</label>
+                        <input type="email" class="form-control" id="email" name="email" placeholder="例：hero@tavern.com" required>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="message" class="form-label">委托内容</label>
+                    <textarea class="form-control" id="message" name="message" rows="4" placeholder="写下你想传达的信息…" required></textarea>
+                </div>
+                <div class="d-flex align-items-center gap-3">
+                    <button type="submit" class="btn btn-primary" id="quest-submit-btn">
+                        <i class="bi bi-send-fill"></i> 提交委托
+                    </button>
+                    <span id="quest-feedback" class="small" style="display:none;"></span>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
