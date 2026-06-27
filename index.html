@@ -676,13 +676,15 @@
 
         .visitor-id-counter-wrap {
             position: relative;
-            display: block;
-            max-width: 200px;
-            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 90px;
+            min-height: 50px;
+            padding: 8px 14px;
             border-radius: 12px;
-            overflow: hidden;
-            border: 1px solid rgba(255,255,255,0.14);
             background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.14);
             box-shadow: 0 8px 18px rgba(0,0,0,0.18);
         }
 
@@ -698,12 +700,25 @@
             z-index: 1;
         }
 
-        .visitor-id-counter-image {
-            display: block;
-            width: 100%;
-            height: auto;
+        .visitor-id-guild-seal {
+            display: flex;
+            align-items: center;
+            gap: 8px;
             position: relative;
             z-index: 0;
+        }
+
+        .visitor-id-guild-icon {
+            font-size: 1.6rem;
+            line-height: 1;
+        }
+
+        .visitor-id-guild-text {
+            font-size: 0.82rem;
+            font-weight: 800;
+            color: #fbbf24;
+            letter-spacing: 0.06em;
+            line-height: 1.2;
         }
 
         .visitor-id-counter-note {
@@ -954,10 +969,9 @@
 
     <script>
         (function () {
-            const totalKey = 'visitorBadgeProfileTotal_v2';
-            const dateKey = 'visitorBadgeDate_v3';
-            const imageKey = 'visitorBadgeGlobalImage_v2';
-            const countImageBase = 'https://count.getloli.com/get/@Taowayi-guild?theme=asoul';
+            const totalKey = 'visitorBadgeProfileTotal_v3';
+            const dateKey = 'visitorBadgeDate_v5';
+            const imageKey = 'visitorBadgeCached_v5';
 
             const today = (() => {
                 const now = new Date();
@@ -979,7 +993,7 @@
                 return;
             }
 
-            const renderBadge = (localVisits, firstVisitToday, sourceLabel, globalImageSrc) => {
+            const renderBadge = (localVisits, firstVisitToday, sourceLabel, imgSrc) => {
                 const expPerLevel = 7;
                 const level = Math.floor(localVisits / expPerLevel) + 1;
                 const exp = localVisits % expPerLevel;
@@ -994,9 +1008,7 @@
                 ];
                 const rank = rankList[Math.min(rankList.length - 1, Math.floor((level - 1) / 2))];
 
-                if (globalImageSrc) {
-                    totalEl.src = globalImageSrc;
-                }
+                if (imgSrc) totalEl.src = imgSrc;
                 todayEl.textContent = firstVisitToday ? '委托达成' : '待命中';
                 statusEl.textContent = sourceLabel;
                 rarityEl.textContent = localVisits >= 10 ? 'SSR' : localVisits >= 5 ? 'SR' : 'R';
@@ -1008,7 +1020,8 @@
             try {
                 // 清理旧版缓存，从头开始计数
                 ['visitorBadgeTotal_v1', 'visitorBadgeDate_v1', 'visitorBadgeDate_v2',
-                 'visitorBadgeGlobalImage_v1', 'visitorBadgeProfileTotal_v1'].forEach(function (k) {
+                 'visitorBadgeGlobalImage_v1', 'visitorBadgeGlobalImage_v2',
+                 'visitorBadgeProfileTotal_v1'].forEach(function (k) {
                     localStorage.removeItem(k);
                 });
 
@@ -1020,31 +1033,36 @@
                     localVisits = 0;
                 }
 
-                const cachedImageSrc = localStorage.getItem(imageKey);
+                const countBase = 'https://count.getloli.com/get/@Taowayi-guild?theme=asoul';
+                const countUrl = countBase + '&v=' + today;
+
                 if (!firstVisitToday) {
-                    totalEl.src = cachedImageSrc || `${countImageBase}&v=${today}`;
-                    renderBadge(localVisits, false, '待命中', null);
+                    totalEl.src = localStorage.getItem(imageKey) || countUrl;
+                    renderBadge(localVisits, false, '待命中');
                     return;
                 }
 
+                // 当日首访：加载计数图 + 缓存 URL，当天不再变
                 localVisits += 1;
                 localStorage.setItem(totalKey, String(localVisits));
                 localStorage.setItem(dateKey, today);
 
-                const globalImageSrc = `${countImageBase}&v=${encodeURIComponent(today)}`;
-                const cacheImage = new Image();
-                cacheImage.onload = () => {
-                    localStorage.setItem(imageKey, globalImageSrc);
-                    renderBadge(localVisits, true, '报到完了', globalImageSrc);
+                var ping = new Image();
+                ping.onload = function () {
+                    totalEl.src = countUrl;
+                    localStorage.setItem(imageKey, countUrl);
+                    renderBadge(localVisits, true, '报到完了');
                 };
-                cacheImage.onerror = () => {
-                    renderBadge(localVisits, true, '单人探索', cachedImageSrc || globalImageSrc);
+                ping.onerror = function () {
+                    totalEl.src = localStorage.getItem(imageKey) || countUrl;
+                    renderBadge(localVisits, true, '单人探索');
                 };
-                cacheImage.src = globalImageSrc;
+                ping.src = countUrl;
             } catch (error) {
-                const fallbackLocalVisits = parseInt(localStorage.getItem(totalKey) || '1', 10);
-                const localVisits = Number.isFinite(fallbackLocalVisits) && fallbackLocalVisits > 0 ? fallbackLocalVisits : 1;
-                renderBadge(localVisits, true, '单人探索', localStorage.getItem(imageKey) || `${countImageBase}&v=${encodeURIComponent(today)}`);
+                var fallback = parseInt(localStorage.getItem(totalKey) || '1', 10);
+                if (!Number.isFinite(fallback) || fallback < 0) fallback = 1;
+                totalEl.src = localStorage.getItem(imageKey) || '';
+                renderBadge(fallback, true, '单人探索');
             }
         })();
     </script>
