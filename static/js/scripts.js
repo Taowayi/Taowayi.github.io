@@ -242,8 +242,9 @@ function initPublicationSection() {
     };
 
     const bindMediaInteractions = () => {
-        const cardImages = document.querySelectorAll('img:not(#avatar img):not(.top-section .banner-img)');
-        cardImages.forEach(img => {
+        // 只让「我的B站数据」中的 Muse.png 可点击放大
+        const biliImages = document.querySelectorAll('img[src*="Muse.png"]');
+        biliImages.forEach(img => {
             img.style.cursor = 'zoom-in';
             img.addEventListener('click', () => {
                 if (!lightbox || !lightboxImg) return;

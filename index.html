@@ -265,38 +265,100 @@
         }
         
         footer {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            background: url('static/assets/img/VenAndT.jpg') center/cover no-repeat;
             color: white;
             position: relative;
             overflow: hidden;
         }
-        
+
         footer::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-image: 
-                repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,.05) 10px, rgba(255,255,255,.05) 20px),
-                repeating-linear-gradient(-45deg, transparent, transparent 10px, rgba(255,255,255,.05) 10px, rgba(255,255,255,.05) 20px);
+            inset: 0;
+            background: linear-gradient(135deg, rgba(11,18,32,0.7), rgba(49,46,129,0.55));
             pointer-events: none;
+            z-index: 0;
         }
-        
+
         footer .container {
             position: relative;
             z-index: 1;
         }
-        
+
         footer a {
-            color: white;
+            color: rgba(255,255,255,0.7);
             text-decoration: none;
-            transition: color 0.3s;
         }
-        
+
         footer a:hover {
-            color: var(--secondary-color);
+            color: #fbbf24;
+        }
+
+        .footer-bar {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 12px 0;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .footer-avatar {
+            width: 42px; height: 42px;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 2px solid rgba(251,191,36,0.5);
+            flex-shrink: 0;
+        }
+        .footer-avatar img { width:100%; height:100%; object-fit:cover; display:block; }
+
+        .footer-divider {
+            width: 1px; height: 28px;
+            background: rgba(255,255,255,0.2);
+        }
+
+        .footer-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .footer-name { font-weight:800; color:#fff; font-size:0.95rem; }
+        .footer-rarity { font-size:0.72rem; font-weight:900; padding:3px 7px; border-radius:999px; background:linear-gradient(135deg,#f59e0b,#fb7185); color:#fff; }
+        .footer-status { font-size:0.75rem; color:rgba(255,255,255,0.7); }
+
+        .footer-level {
+            display: flex; align-items: center; gap: 6px;
+            font-size:0.82rem; color:rgba(255,255,255,0.8);
+        }
+        .footer-level strong { color:#22d3ee; }
+
+        .footer-ring-wrap {
+            width:40px; height:40px;
+            position:relative;
+            flex-shrink:0;
+        }
+        .footer-ring-wrap svg { width:100%; height:100%; transform:rotate(-90deg); }
+        .footer-ring-bg { fill:none; stroke:rgba(255,255,255,0.15); stroke-width:4; }
+        .footer-ring-fill { fill:none; stroke:#22d3ee; stroke-width:4; stroke-linecap:round; transition: stroke-dashoffset 0.45s ease; }
+        .footer-ring-center {
+            position:absolute; inset:0;
+            display:flex; align-items:center; justify-content:center;
+            font-size:0.55rem; font-weight:900; color:#fff;
+        }
+
+        .footer-counter img {
+            height: auto;
+            max-height: 36px;
+            width: auto;
+            max-width: 260px;
+            display: block;
+        }
+
+        .footer-copy {
+            font-size:0.7rem;
+            color:rgba(255,255,255,0.45);
+            text-align:center;
+            padding: 6px 0 10px;
         }
         /* MathJax SVG 样式与字体区分 */
         .mjx-container { line-height: 1.1; }
@@ -474,7 +536,8 @@
                 body.dark-mode .hobby-desc { color:#cbd5e1; }
                 body.dark-mode .hobby-chip { background: rgba(167,139,250,0.16); color:#c4b5fd; }
                 /* 夜间模式下的页脚：更柔和的低对比蓝紫 */
-                body.dark-mode footer { background: linear-gradient(135deg, #0f172a 0%, #162238 50%, #1e2b46 100%); }
+                body.dark-mode footer { background: url('static/assets/img/Girl.jpg') center/cover no-repeat; }
+                body.dark-mode footer::before { background: linear-gradient(135deg, rgba(5,8,18,0.88), rgba(20,18,50,0.75)); }
                 body.dark-mode #load-toast { background:#111827; color:#e5e7eb; border-color:#374151; }
                 body.dark-mode .kpi-card { background:linear-gradient(135deg, rgba(167,139,250,.08), rgba(251,113,133,.08)); border-color:#a78bfa55; }
                 body.dark-mode .kpi-value { color:#e5e7eb; }
@@ -777,10 +840,22 @@
             line-height: 1.1;
         }
 
+        /* 页脚内徽章：撑满全宽，背景由页脚接管 */
+        footer .visitor-id-card {
+            width: 100%;
+            max-width: 100%;
+            border-radius: 0;
+            background: transparent;
+            border: none;
+            box-shadow: none;
+            backdrop-filter: none;
+            padding: 10px 20px;
+        }
+
         @media (max-width: 991px) {
-            .visitor-id-card {
-                width: 100%;
-                margin-top: 1rem;
+            footer .visitor-id-card {
+                flex-wrap: wrap;
+                gap: 8px;
             }
         }
         #quest-board {
@@ -952,70 +1027,41 @@
     <div id="contact-page-mount"></div>
 
     <!-- Footer-->
-    <footer class="bg-bottom text-center py-5">
-        <div class="container px-5 d-flex justify-content-between align-items-center">
-            <div class="text-white-50 small">
-                <div class="mb-2">&copy; Moyu 2025-∞. 保留所有权利。</div>
-                <a href="https://github.com/Taowayi">GitHub</a>
-                <span class="mx-1">&middot;</span>
-                <a href="https://space.bilibili.com/251781364">Bilibili</a>
+    <footer>
+        <div class="container px-4">
+            <div class="footer-bar">
+                <div class="footer-avatar">
+                    <img src="static/assets/img/ZZZ.jpeg" alt="Moyu" />
+                </div>
+                <div class="footer-info">
+                    <span class="footer-name">Moyu · ID</span>
+                    <span id="visitor-rarity" class="footer-rarity">SR</span>
+                </div>
+                <span class="footer-divider"></span>
+                <span class="footer-status" id="visitor-status">加载中</span>
+                <span class="footer-divider"></span>
+                <div class="footer-level">
+                    职阶: <strong id="visitor-level">见习术士 Lv.01</strong>
+                </div>
+                <div class="footer-ring-wrap">
+                    <svg viewBox="0 0 40 40">
+                        <circle class="footer-ring-bg" cx="20" cy="20" r="16"/>
+                        <circle id="visitor-exp-fill" class="footer-ring-fill" cx="20" cy="20" r="16"
+                            stroke-dasharray="100.5" stroke-dashoffset="100.5"/>
+                    </svg>
+                    <div class="footer-ring-center" id="visitor-exp-level">Lv.01</div>
+                </div>
+                <span class="footer-divider"></span>
+                <span style="font-size:0.78rem; color:rgba(255,255,255,0.7);">今日: <strong id="visitor-today" style="color:#fbbf24;">-</strong></span>
+                <span id="visitor-exp-text" style="display:none;"></span>
             </div>
-            <!-- 角色徽章 / ID 卡 -->
-            <div id="visitor-card" class="visitor-id-card mt-3" aria-label="访客徽章">
-                <div class="visitor-id-avatar">
-                    <img src="static/assets/img/ZZZ.jpeg" alt="Moyu 头像" />
-                </div>
-                <div class="visitor-id-body">
-                    <div class="visitor-id-top">
-                        <div>
-                            <div class="visitor-id-headline">
-                                <div class="visitor-id-name">Moyu · ID</div>
-                                <div id="visitor-rarity" class="visitor-id-rarity">SR</div>
-                            </div>
-                            <div class="visitor-id-title">冒险家工会 · 风吟分部 / 冒险者档案</div>
-                        </div>
-                        <div id="visitor-status" class="visitor-id-status">加载中</div>
-                    </div>
-                    <div class="visitor-id-rpg">
-                        <div class="visitor-id-level-block">
-                            <div class="visitor-id-level-label">职阶</div>
-                            <div id="visitor-level" class="visitor-id-level-badge">见习术士 Lv.01</div>
-                        </div>
-                        <div class="visitor-id-exp-block">
-                            <!-- HUD 环形仪表 -->
-                            <svg class="visitor-id-exp-ring" viewBox="0 0 72 72">
-                                <defs>
-                                    <linearGradient id="hudGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                                        <stop offset="0%" stop-color="#34d399"/>
-                                        <stop offset="50%" stop-color="#22d3ee"/>
-                                        <stop offset="100%" stop-color="#818cf8"/>
-                                    </linearGradient>
-                                </defs>
-                                <circle class="visitor-id-exp-ring-bg" cx="36" cy="36" r="30"/>
-                                <circle id="visitor-exp-fill" class="visitor-id-exp-ring-fill" cx="36" cy="36" r="30"
-                                    stroke-dasharray="188.5" stroke-dashoffset="188.5"/>
-                            </svg>
-                            <div class="visitor-id-exp-center">
-                                <div id="visitor-exp-level" class="visitor-id-exp-level">Lv.01</div>
-                                <div class="visitor-id-exp-sub">EXP</div>
-                            </div>
-                            <!-- 保留给 JS 的隐藏元素 -->
-                            <span id="visitor-exp-text" style="display:none;"></span>
-                        </div>
-                    </div>
-                    <div class="visitor-id-stats">
-                        <div class="visitor-id-counter-box visitor-id-stat">
-                            <div class="visitor-id-label">冒险者登记</div>
-                            <div class="visitor-id-counter-wrap">
-                                <img id="visitor-total" class="visitor-id-counter-image" alt="冒险者登记簿" />
-                            </div>
-                        </div>
-                        <div class="visitor-id-stat">
-                            <div class="visitor-id-label">今日委托</div>
-                            <div id="visitor-today" class="visitor-id-value">-</div>
-                        </div>
-                    </div>
-                </div>
+            <div class="footer-counter" style="display:flex; justify-content:center; padding:4px 0;">
+                <img id="visitor-total" style="max-width:260px; height:auto;" alt="冒险者登记簿" />
+            </div>
+            <div class="footer-copy">
+                &copy; Moyu 2025-&infin; &middot;
+                <a href="https://github.com/Taowayi">GitHub</a> &middot;
+                <a href="https://space.bilibili.com/251781364">Bilibili</a>
             </div>
         </div>
     </footer>
@@ -1055,9 +1101,9 @@
                 var epl = 50, lv = Math.floor(v / epl) + 1, exp = v % epl;
                 var ranks = ['见习术士','青铜冒险者','白银探索者','黄金讨伐者','秘银旅人','传说勇者'];
                 var rank = ranks[Math.min(ranks.length - 1, Math.floor((lv - 1) / 3))];
-                var circumference = 188.5;
+                var circumference = 100.5;
                 rarityEl.textContent = v >= 500 ? 'SSR' : v >= 100 ? 'SR' : 'R';
-                levelEl.textContent = rank + ' Lv.' + String(lv).padStart(2, '0');
+                levelEl.innerHTML = rank + ' Lv.' + String(lv).padStart(2, '0');
                 expFillEl.setAttribute('stroke-dashoffset', circumference - (exp / epl * circumference));
                 expLevelEl.textContent = 'Lv.' + String(lv).padStart(2, '0');
             }
