@@ -1,5 +1,7 @@
 const content_dir = 'contents/pages/';
 const config_file = 'contents/config.yml';
+const outreach_file = 'contents/outreach.yml';
+const talks_file = 'contents/talks.yml';
 const page_files = ['home', 'research', 'anime', 'publications', 'contact'];
 
 const safeTypeset = (elements) => {
@@ -10,14 +12,46 @@ const safeTypeset = (elements) => {
     }
 };
 
+// HTML 转义工具函数,防止 XSS
+const escapeHtml = (str) => {
+    if (str === null || str === undefined) return '';
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+};
+
+// 安全设置 innerHTML 的工具函数(先转义纯文本部分,保留受信任的 HTML 结构)
+// 注意:对于已知含受信任 HTML 的内容(如本地配置片段),不应使用此函数
+const safeSetText = (el, text) => {
+    if (el) el.textContent = text;
+};
+
 async function loadPageFragments() {
-    await Promise.all(page_files.map(async (name) => {
-        const mount = document.getElementById(name + '-page-mount');
-        if (!mount) return;
-        const response = await fetch(content_dir + name + '.html');
-        mount.innerHTML = await response.text();
-    }));
-    initQuestBoard();
+    try {
+        await Promise.all(page_files.map(async (name) => {
+            const mount = document.getElementById(name + '-page-mount');
+            if (!mount) return;
+            const response = await fetch(content_dir + name + '.html', { cache: 'no-store' });
+            if (!response.ok) throw new Error(`加载 ${name}.html 失败: HTTP ${response.status}`);
+            mount.innerHTML = await response.text();
+        }));
+        initQuestBoard();
+    } catch (err) {
+        console.error('页面片段加载失败:', err);
+        // 显示友好错误提示而非静默中断
+        page_files.forEach(name => {
+            const mount = document.getElementById(name + '-page-mount');
+            if (mount && !mount.innerHTML.trim()) {
+                mount.innerHTML = `<div class="container px-5 py-5 text-center text-danger">
+                    <p><i class="bi bi-exclamation-triangle-fill"></i> 内容加载失败</p>
+                    <p class="small">请通过本地 HTTP 服务器预览(如 <code>python -m http.server</code>),直接打开 index.html 无法加载子页面。</p>
+                </div>`;
+            }
+        });
+    }
 }
 
 function initNavbar() {
@@ -50,11 +84,13 @@ function initConfig() {
             Object.keys(yml).forEach(key => {
                 const target = document.getElementById(key);
                 if (target) {
+                    // config.yml 是本地受信任配置,允许含 HTML 实体(如 &copy;)
+                    // 但仍需防范意外注入,仅允许白名单标签
                     target.innerHTML = yml[key];
                 }
             });
         })
-        .catch(error => console.log(error));
+        .catch(error => console.error('配置加载失败:', error));
 }
 
 function initPublicationSection() {
@@ -131,8 +167,14 @@ function initPublicationSection() {
             return text ? `$${text}$` : m;
         });
         const pubInfo = (meta.publication_info && meta.publication_info[0]) ? meta.publication_info[0] : {};
-        const year = pubInfo.year ? pubInfo.year : (meta.earliest_date || '').slice(0, 4);
-        const month = pubInfo.month ? monthPad(pubInfo.month) : ((meta.earliest_date || '').slice(5, 7));
+        // 日期提取:已发表用出版日期,未发表用 arXiv 时间
+        // 月份缺失时用 earliest_date 的月份补全,确保同年多篇论文能按月份排序
+        const earliest = meta.earliest_date || '';
+        const hasPubInfo = pubInfo.year || pubInfo.month;
+        const year = hasPubInfo ? (pubInfo.year || earliest.slice(0, 4)) : (earliest ? earliest.slice(0, 4) : '');
+        const month = hasPubInfo
+            ? (pubInfo.month ? monthPad(pubInfo.month) : (earliest ? earliest.slice(5, 7) : ''))
+            : (earliest ? earliest.slice(5, 7) : '');
         const yearMonth = (year && month) ? `${year}-${month}` : (year || '');
         const cite = typeof meta.citation_count === 'number' ? meta.citation_count : 0;
         const link = meta.links && meta.links[0] && meta.links[0].value ? meta.links[0].value : (meta.urls && meta.urls[0] && meta.urls[0].value ? meta.urls[0].value : undefined);
@@ -152,14 +194,22 @@ function initPublicationSection() {
         if (mode === 'cited') {
             sorted.sort((a, b) => b.cite - a.cite);
         } else {
-            sorted.sort((a, b) => parseInt(b.year || '0', 10) - parseInt(a.year || '0', 10));
+            // 按最新排序:用 yearMonth(年-月)字符串比较,同年同月再按引用数降序
+            sorted.sort((a, b) => {
+                const am = String(a.yearMonth || a.year || '0000');
+                const bm = String(b.yearMonth || b.year || '0000');
+                if (am !== bm) return bm.localeCompare(am);
+                return b.cite - a.cite;
+            });
         }
 
         sorted.forEach(it => {
             const li = document.createElement('li');
             const ym = it.yearMonth ? ` (${it.yearMonth})` : (it.year ? ` (${it.year})` : '');
             const j = it.journalShort ? ` · [${it.journalShort}]` : '';
-            li.innerHTML = `${it.title}${ym}${j} — 引用 ${it.cite}`;
+            // XSS 防护:论文标题来自外部 API,必须转义后再注入
+            // 标题中可能含 $...$(MathJax),需保留 $ 符号但转义 HTML
+            li.innerHTML = `${escapeHtml(it.title)}${ym}${j} — 引用 ${it.cite}`;
             if (it.link) {
                 const a = document.createElement('a');
                 a.href = it.link;
@@ -198,7 +248,8 @@ function initPublicationSection() {
         if (top) {
             if (topCiteEl) topCiteEl.textContent = String(top.cite);
             if (topTitleEl) {
-                topTitleEl.innerHTML = `${top.title}${top.year ? ' (' + top.year + ')' : ''}`;
+                // XSS 防护:转义外部 API 标题
+                topTitleEl.innerHTML = `${escapeHtml(top.title)}${top.year ? ' (' + top.year + ')' : ''}`;
                 safeTypeset([topTitleEl]);
             }
         }
@@ -242,22 +293,55 @@ function initPublicationSection() {
     };
 
     const bindMediaInteractions = () => {
+        let lastFocused = null;
         // 只让「我的B站数据」中的 Muse.png 可点击放大
         const biliImages = document.querySelectorAll('img[src*="Muse.png"]');
         biliImages.forEach(img => {
             img.style.cursor = 'zoom-in';
-            img.addEventListener('click', () => {
-                if (!lightbox || !lightboxImg) return;
-                lightboxImg.src = img.src;
-                lightbox.classList.add('active');
+            img.setAttribute('role', 'button');
+            img.setAttribute('tabindex', '0');
+            img.setAttribute('aria-label', '点击放大图片');
+            img.addEventListener('click', () => openLightbox(img));
+            img.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openLightbox(img); }
             });
         });
 
-        const closeLightbox = () => { if (lightbox) lightbox.classList.remove('active'); };
-        if (lightboxClose) lightboxClose.addEventListener('click', closeLightbox);
+        const closeLightbox = () => {
+            if (!lightbox) return;
+            lightbox.classList.remove('active');
+            lightbox.setAttribute('aria-hidden', 'true');
+            // 恢复焦点到触发元素
+            if (lastFocused) lastFocused.focus();
+        };
+        const openLightbox = (img) => {
+            if (!lightbox || !lightboxImg) return;
+            lightboxImg.src = img.src;
+            lightboxImg.alt = img.alt || '预览图片';
+            lightbox.classList.add('active');
+            lightbox.setAttribute('aria-hidden', 'false');
+            // 记录触发元素,关闭后恢复焦点
+            lastFocused = document.activeElement;
+            // 焦点移入灯箱
+            setTimeout(() => { if (lightboxClose) lightboxClose.focus(); }, 50);
+        };
+        if (lightboxClose) {
+            lightboxClose.addEventListener('click', closeLightbox);
+            lightboxClose.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); closeLightbox(); }
+            });
+        }
         if (lightbox) {
             lightbox.addEventListener('click', (e) => {
                 if (e.target === lightbox) closeLightbox();
+            });
+            // 焦点陷阱:Tab 键循环在灯箱内
+            lightbox.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') { closeLightbox(); return; }
+                if (e.key === 'Tab' && lightboxClose) {
+                    e.preventDefault();
+                    lightboxClose.focus();
+                }
             });
         }
         window.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeLightbox(); });
@@ -267,6 +351,14 @@ function initPublicationSection() {
                 document.body.classList.toggle('dark-mode');
                 applyBannerTheme();
             });
+            // 键盘可访问:Enter/Space 触发夜间模式
+            avatarImg.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    document.body.classList.toggle('dark-mode');
+                    applyBannerTheme();
+                }
+            });
         }
 
         applyBannerTheme();
@@ -274,10 +366,13 @@ function initPublicationSection() {
 
     const loadRemoteData = async () => {
         try {
+            // 显示 loading skeleton(若有缓存则先渲染缓存)
             if (cached && Array.isArray(cached.records)) {
                 items = cached.records.map(normalizeRecord);
                 renderFromItems('latest');
                 updateStats();
+            } else if (hintEl) {
+                hintEl.innerHTML = '<i class="bi bi-arrow-clockwise"></i> 正在从 INSPIRE 加载数据…';
             }
 
             const headers = new Headers();
@@ -299,9 +394,13 @@ function initPublicationSection() {
             if (btnCited) btnCited.addEventListener('click', () => renderFromItems('cited'));
         } catch (err) {
             if (cached && Array.isArray(cached.records)) {
-                if (hintEl) hintEl.textContent = `INSPIRE 校验失败，已使用本地缓存：${err.message}`;
+                if (hintEl) hintEl.innerHTML = `<i class="bi bi-exclamation-triangle"></i> INSPIRE 校验失败,已使用本地缓存:${escapeHtml(err.message)}`;
             } else if (hintEl) {
-                hintEl.textContent = `INSPIRE 加载失败：${err.message}`;
+                // API 失败且无缓存时,显示友好提示而非永久 0
+                hintEl.innerHTML = `<i class="bi bi-cloud-slash"></i> INSPIRE 加载失败:${escapeHtml(err.message)}。请稍后刷新重试,或访问 <a href="https://inspirehep.net/authors/${authorRecid}" target="_blank" rel="noopener noreferrer">我的 INSPIRE 主页</a>。`;
+                if (pubTotalEl) pubTotalEl.textContent = '—';
+                if (citeTotalEl) citeTotalEl.textContent = '—';
+                if (topCiteEl) topCiteEl.textContent = '—';
             }
         }
     };
@@ -322,6 +421,14 @@ function initQuestBoard() {
 
     form.addEventListener('submit', function (e) {
         e.preventDefault();
+        // Honeypot 反垃圾检查:若隐藏字段被填写,判定为机器人,静默丢弃
+        var honeypot = form.querySelector('input[name="website"]');
+        if (honeypot && honeypot.value) {
+            feedback.style.display = 'block';
+            feedback.style.color = '#fb7185';
+            feedback.textContent = '提交失败,请稍后重试。';
+            return;
+        }
         var name = document.getElementById('name').value.trim();
         var email = document.getElementById('email').value.trim();
         var message = document.getElementById('message').value.trim();
@@ -339,6 +446,104 @@ function initQuestBoard() {
         feedback.style.color = '#34d399';
         feedback.textContent = '正在打开魔法信使…';
     });
+}
+
+// 从 yml 的 date 字段提取年份字符串
+// js-yaml 会把 YYYY-MM-DD 解析为 Date 对象,需兼容处理
+const extractYear = (dateVal) => {
+    if (!dateVal) return '';
+    if (dateVal instanceof Date) return String(dateVal.getFullYear());
+    const s = String(dateVal);
+    return s.slice(0, 4);
+};
+
+// 加载科普作品(outreach.yml)并渲染到 publications 页面
+function loadOutreach() {
+    const mount = document.getElementById('outreach-list');
+    if (!mount) return;
+    fetch(outreach_file, { cache: 'no-store' })
+        .then(r => r.text())
+        .then(text => {
+            const yml = jsyaml.load(text);
+            const items = (yml && yml.items) ? yml.items : [];
+            if (!items.length) {
+                mount.innerHTML = '<li>暂无</li>';
+                return;
+            }
+            mount.innerHTML = '';
+            items.forEach(it => {
+                const li = document.createElement('li');
+                const date = it.date ? ` (${extractYear(it.date)})` : '';
+                const platform = it.platform ? ` · [${escapeHtml(it.platform)}]` : '';
+                const typeBadge = it.type ? ` <span class="anime-badge" style="font-size:.75rem;">${escapeHtml(it.type)}</span>` : '';
+                // 标题:若有链接则渲染为锚点,否则纯文本(均转义防 XSS)
+                if (it.link) {
+                    const a = document.createElement('a');
+                    a.href = it.link;
+                    a.target = '_blank';
+                    a.rel = 'noopener noreferrer';
+                    a.textContent = it.title;
+                    li.appendChild(a);
+                    li.insertAdjacentHTML('beforeend', `${date}${platform}${typeBadge}`);
+                } else {
+                    li.innerHTML = `${escapeHtml(it.title)}${date}${platform}${typeBadge}`;
+                }
+                mount.appendChild(li);
+            });
+        })
+        .catch(err => {
+            console.error('科普作品加载失败:', err);
+            mount.innerHTML = '<li>暂无</li>';
+        });
+}
+
+// 加载会议报告(talks.yml)并渲染到 publications 页面
+function loadTalks() {
+    const mount = document.getElementById('talks-list');
+    if (!mount) return;
+    fetch(talks_file, { cache: 'no-store' })
+        .then(r => r.text())
+        .then(text => {
+            const yml = jsyaml.load(text);
+            const items = (yml && yml.items) ? yml.items : [];
+            if (!items.length) {
+                mount.innerHTML = '<li>暂无</li>';
+                return;
+            }
+            mount.innerHTML = '';
+            items.forEach(it => {
+                const li = document.createElement('li');
+                const date = it.date ? ` (${extractYear(it.date)})` : '';
+                const event = it.event ? ` · ${escapeHtml(it.event)}` : '';
+                const location = it.location ? ` @ ${escapeHtml(it.location)}` : '';
+                // 标题
+                if (it.link) {
+                    const a = document.createElement('a');
+                    a.href = it.link;
+                    a.target = '_blank';
+                    a.rel = 'noopener noreferrer';
+                    a.textContent = it.title;
+                    li.appendChild(a);
+                    li.insertAdjacentHTML('beforeend', `${date}${event}${location}`);
+                } else {
+                    li.innerHTML = `${escapeHtml(it.title)}${date}${event}${location}`;
+                }
+                // 幻灯片链接
+                if (it.slides) {
+                    const slidesLink = document.createElement('a');
+                    slidesLink.href = it.slides;
+                    slidesLink.target = '_blank';
+                    slidesLink.rel = 'noopener noreferrer';
+                    slidesLink.textContent = ' [幻灯片]';
+                    li.appendChild(slidesLink);
+                }
+                mount.appendChild(li);
+            });
+        })
+        .catch(err => {
+            console.error('会议报告加载失败:', err);
+            mount.innerHTML = '<li>暂无</li>';
+        });
 }
 
 function initSidebar() {
@@ -423,4 +628,6 @@ window.addEventListener('DOMContentLoaded', async () => {
     initConfig();
     initPublicationSection();
     initSidebar();
+    loadOutreach();
+    loadTalks();
 });

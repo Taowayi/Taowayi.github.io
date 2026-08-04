@@ -1,0 +1,30 @@
+# IDE & 编辑器
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# 操作系统
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# 备份文件
+*.backup
+*.bak
+*.orig
+
+# Node(若未来引入)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# 构建输出(若未来引入)
+dist/
+build/
+
+# 临时文件
+*.tmp
+*.log

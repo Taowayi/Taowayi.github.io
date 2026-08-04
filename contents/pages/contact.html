@@ -20,9 +20,9 @@
             <div class="col-md-6">
                 <div class="anime-card h-100">
                     <h3>🎌 二次元酒馆</h3>
-                    <p><i class="bi bi-twitter"></i> <strong>冒险日志:</strong> NNN</p>
-                    <p><i class="bi bi-play-btn-fill"></i> <strong>传送门:</strong> 贾大爷看了想乱舞</p>
-                    <p><i class="bi bi-discord"></i> <strong>小队频道:</strong> NNN</p>
+                    <p><i class="bi bi-twitter"></i> <strong>冒险日志:</strong> 暂无</p>
+                    <p><i class="bi bi-play-btn-fill"></i> <strong>传送门:</strong> <a href="https://space.bilibili.com/251781364" target="_blank" rel="noopener noreferrer">Bilibili 主页</a></p>
+                    <p><i class="bi bi-discord"></i> <strong>小队频道:</strong> 暂未开放</p>
 
                     <h4 class="mt-4">🎪 集会出没</h4>
                     <p>以下集会可以捕捉到野生 Moyu：</p>
@@ -38,7 +38,11 @@
         <div class="anime-card mt-4" id="quest-board">
             <h3>📜 委托留言板</h3>
             <p class="text-muted mb-3">有事找我？填下表，信使会将委托送达工会邮箱。</p>
-            <form id="quest-form">
+            <form id="quest-form" action="mailto:contact@example.com" method="post" enctype="text/plain">
+                <!-- Honeypot 反垃圾字段(对用户隐藏,机器人会填写) -->
+                <div style="position:absolute; left:-9999px; top:-9999px;" aria-hidden="true">
+                    <label>请勿填写此字段:<input type="text" name="website" tabindex="-1" autocomplete="off" /></label>
+                </div>
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label for="name" class="form-label">冒险者名号</label>
@@ -57,7 +61,7 @@
                     <button type="submit" class="btn btn-primary" id="quest-submit-btn">
                         <i class="bi bi-send-fill"></i> 提交委托
                     </button>
-                    <span id="quest-feedback" class="small" style="display:none;"></span>
+                    <span id="quest-feedback" class="small" role="status" aria-live="polite" style="display:none;"></span>
                 </div>
             </form>
         </div>

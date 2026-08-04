@@ -66,6 +66,8 @@ class FunWidget {
                 this.container.style.display = 'none';
                 this.createRestoreButton();
             }, 200);
+            // 面板隐藏时暂停 Canvas
+            if (this._pauseCanvas) this._pauseCanvas();
         });
 
         minBtn.addEventListener('click', () => {
@@ -74,6 +76,12 @@ class FunWidget {
             quotes.style.display = minimized ? 'none' : 'block';
             links.style.display = minimized ? 'none' : 'flex';
             this.container.style.height = minimized ? '44px' : '420px';
+            // 折叠时暂停 Canvas,展开时恢复
+            if (minimized) {
+                if (this._pauseCanvas) this._pauseCanvas();
+            } else {
+                if (this._resumeCanvas) this._resumeCanvas();
+            }
             try { localStorage.setItem('fw-min', minimized ? '1' : '0'); } catch {}
         });
 
@@ -148,6 +156,8 @@ class FunWidget {
         const canvas = this.container.querySelector('#fw-canvas');
         const ctx = canvas.getContext('2d');
         const W = canvas.width, H = canvas.height;
+        this.canvasAnimId = null;
+        this.canvasVisible = true;
 
         const bodies = Array.from({ length: 36 }).map((_, i) => ({
             angle: Math.random() * Math.PI * 2,
@@ -158,6 +168,10 @@ class FunWidget {
         }));
 
         const draw = () => {
+            if (!this.canvasVisible) {
+                this.canvasAnimId = null;
+                return;
+            }
             ctx.clearRect(0, 0, W, H);
             ctx.save();
             ctx.translate(W / 2, H / 2);
@@ -205,9 +219,24 @@ class FunWidget {
             }
 
             ctx.restore();
-            requestAnimationFrame(draw);
+            this.canvasAnimId = requestAnimationFrame(draw);
         };
         draw();
+
+        // 面板隐藏/折叠时暂停 Canvas 动画,节省资源
+        this._pauseCanvas = () => {
+            this.canvasVisible = false;
+            if (this.canvasAnimId) {
+                cancelAnimationFrame(this.canvasAnimId);
+                this.canvasAnimId = null;
+            }
+        };
+        this._resumeCanvas = () => {
+            if (!this.canvasVisible) {
+                this.canvasVisible = true;
+                if (!this.canvasAnimId) draw();
+            }
+        };
     }
 }
 
@@ -258,6 +287,8 @@ FunWidget.prototype.createRestoreButton = function () {
             }, 10);
         }
         btn.remove();
+        // 恢复 Canvas 动画
+        if (this._resumeCanvas) this._resumeCanvas();
     });
     document.body.appendChild(btn);
 };

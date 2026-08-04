@@ -18,24 +18,46 @@ This project is built upon an open-source template, originally from [Yixin Huang
 ## 项目结构 | Project Structure
 
 本项目包含以下主要板块：
-- **首页 (Home)**: 个人简介和核心信息
-- **工作经历 (Experience)**: 工作和实习经历
-- **发表论文 (Publications)**: 学术成果展示
-- **获奖情况 (Awards)**: 荣誉与奖项
+- **首页 (Home)**: 个人简介、教育背景、研究兴趣与近期爱好
+- **研究领域 (Research)**: 中子星物态方程等研究方向介绍
+- **娱乐 (Anime)**: 二次元爱好、B站数据、动漫清单
+- **发表论文 (Publications)**: 学术成果展示(INSPIRE API 自动同步)、会议报告、科普作品
+- **联系方式 (Contact)**: 联络方式与委托留言板
 
 The project includes the following sections:
-- **Home**: Personal introduction and core information
-- **Experience**: Work and internship history
-- **Publications**: Academic achievements
-- **Awards**: Honors and awards
+- **Home**: Personal introduction, education, research interests and hobbies
+- **Research**: Research areas such as neutron star equation of state
+- **Anime**: ACG hobbies, Bilibili stats, anime list
+- **Publications**: Academic achievements (auto-synced via INSPIRE API), talks, outreach
+- **Contact**: Contact info and message board
 
 ## 技术说明 | Technical Details
 
 ### 本地开发 | Local Development
 
-直接用浏览器打开 `index.html` 即可预览主页效果。
+由于页面内容通过 `fetch` 动态加载,**不能直接用浏览器打开 `index.html`**(会因 CORS 失败导致内容为空)。需启动本地 HTTP 服务器：
 
-Simply open `index.html` in your browser to preview the homepage.
+```bash
+# Python 3
+python -m http.server 8000
+
+# 或 Node.js (需先 npm i -g serve)
+serve .
+```
+
+然后访问 `http://localhost:8000` 预览主页效果。
+
+Since page content is loaded dynamically via `fetch`, **do not open `index.html` directly** (it will fail due to CORS). Start a local HTTP server instead:
+
+```bash
+# Python 3
+python -m http.server 8000
+
+# Or Node.js (install serve first: npm i -g serve)
+serve .
+```
+
+Then visit `http://localhost:8000` to preview.
 
 ### 内容编辑 | Content Editing
 

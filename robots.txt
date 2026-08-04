@@ -1,0 +1,10 @@
+# robots.txt for taowayi.github.io
+User-agent: *
+Allow: /
+
+# 禁止爬取备份与配置文件
+Disallow: /*.backup
+Disallow: /*.bak
+
+# 站点地图
+Sitemap: https://taowayi.github.io/sitemap.xml

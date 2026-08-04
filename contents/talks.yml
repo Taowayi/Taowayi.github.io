@@ -2,14 +2,10 @@
 # Edit this file to update your talks without changing code.
 # Fields: title, event, location, date (YYYY-MM-DD), link (optional), slides (optional)
 items:
-  - title: Probing g-mode in stellar interiors
-    event: Conference on Astrophysics 2025
-    location: Kyoto, Japan
-    date: 2025-11-15
-    link: https://example.com/talks/gmode
-    slides: https://example.com/slides/gmode.pdf
-  - title: Neutrino oscillations and cosmology
-    event: Physics Colloquium
-    location: Beijing University
-    date: 2025-09-02
-    slides: https://example.com/slides/neutrino.pdf
+  - title: Equation of state for dense stellar matter in RMF models
+    event: Quark and Compact Star
+    location: JAEA Tokai Mirai Base
+    date: 2026-05-02
+    link: https://indico2.riken.jp/event/5301/overview
+    #slides: https://example.com/slides/gmode.pdf
+

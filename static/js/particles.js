@@ -1,6 +1,10 @@
 // 粒子特效系统
 class ParticleSystem {
     constructor() {
+        // 尊重用户减少动画偏好
+        this.reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (this.reducedMotion) return;
+
         this.canvas = document.createElement('canvas');
         this.canvas.id = 'particle-canvas';
         this.canvas.style.position = 'fixed';
@@ -14,13 +18,38 @@ class ParticleSystem {
         
         this.ctx = this.canvas.getContext('2d');
         this.particles = [];
-        this.particleCount = 80;
+        // 移动端降低粒子数以提升性能
+        const isMobile = window.innerWidth < 768;
+        this.particleCount = isMobile ? 30 : 60;
+        this.linkDistance = 120;
+        this.linkDistanceSq = this.linkDistance * this.linkDistance;
+        this.animationId = null;
+        this.isVisible = true;
+        
+        this.resize = this.resize.bind(this);
+        this.animate = this.animate.bind(this);
         
         this.resize();
         this.init();
         this.animate();
         
-        window.addEventListener('resize', () => this.resize());
+        // resize 防抖
+        let resizeTimer = null;
+        window.addEventListener('resize', () => {
+            if (resizeTimer) clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(this.resize, 200);
+        });
+
+        // 页面不可见时暂停动画,节省资源
+        document.addEventListener('visibilitychange', () => {
+            this.isVisible = !document.hidden;
+            if (this.isVisible && !this.animationId) {
+                this.animate();
+            } else if (!this.isVisible && this.animationId) {
+                cancelAnimationFrame(this.animationId);
+                this.animationId = null;
+            }
+        });
     }
     
     resize() {
@@ -52,43 +81,52 @@ class ParticleSystem {
     }
     
     animate() {
+        if (!this.isVisible) return;
+        
         this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
         
-        // 绘制粒子
-        this.particles.forEach((particle, index) => {
-            particle.x += particle.vx;
-            particle.y += particle.vy;
+        const n = this.particles.length;
+        // 绘制粒子并更新位置
+        for (let i = 0; i < n; i++) {
+            const p = this.particles[i];
+            p.x += p.vx;
+            p.y += p.vy;
             
             // 边界反弹
-            if (particle.x < 0 || particle.x > this.canvas.width) particle.vx *= -1;
-            if (particle.y < 0 || particle.y > this.canvas.height) particle.vy *= -1;
+            if (p.x < 0 || p.x > this.canvas.width) p.vx *= -1;
+            if (p.y < 0 || p.y > this.canvas.height) p.vy *= -1;
             
             // 绘制粒子
             this.ctx.beginPath();
-            this.ctx.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
-            this.ctx.fillStyle = particle.color;
+            this.ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+            this.ctx.fillStyle = p.color;
             this.ctx.fill();
-            
-            // 绘制连接线
-            this.particles.forEach((particle2, index2) => {
-                if (index !== index2) {
-                    const dx = particle.x - particle2.x;
-                    const dy = particle.y - particle2.y;
-                    const distance = Math.sqrt(dx * dx + dy * dy);
-                    
-                    if (distance < 120) {
-                        this.ctx.beginPath();
-                        this.ctx.strokeStyle = `rgba(106, 90, 205, ${0.2 * (1 - distance / 120)})`;
-                        this.ctx.lineWidth = 0.5;
-                        this.ctx.moveTo(particle.x, particle.y);
-                        this.ctx.lineTo(particle2.x, particle2.y);
-                        this.ctx.stroke();
-                    }
-                }
-            });
-        });
+        }
         
-        requestAnimationFrame(() => this.animate());
+        // 绘制连接线(O(n²) 优化:用平方距离避免开方,提前过滤)
+        for (let i = 0; i < n; i++) {
+            const p1 = this.particles[i];
+            for (let j = i + 1; j < n; j++) {
+                const p2 = this.particles[j];
+                const dx = p1.x - p2.x;
+                // x 方向距离已超阈值,提前跳过(避免不必要的 y 计算和开方)
+                if (dx > this.linkDistance || dx < -this.linkDistance) continue;
+                const dy = p1.y - p2.y;
+                if (dy > this.linkDistance || dy < -this.linkDistance) continue;
+                const distSq = dx * dx + dy * dy;
+                if (distSq < this.linkDistanceSq) {
+                    const distance = Math.sqrt(distSq);
+                    this.ctx.beginPath();
+                    this.ctx.strokeStyle = `rgba(106, 90, 205, ${0.2 * (1 - distance / this.linkDistance)})`;
+                    this.ctx.lineWidth = 0.5;
+                    this.ctx.moveTo(p1.x, p1.y);
+                    this.ctx.lineTo(p2.x, p2.y);
+                    this.ctx.stroke();
+                }
+            }
+        }
+        
+        this.animationId = requestAnimationFrame(this.animate);
     }
 }
 

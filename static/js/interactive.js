@@ -1,9 +1,26 @@
 // 头像点击特效和其他趣味互动
 class InteractiveEffects {
     constructor() {
+        // 尊重用户减少动画偏好
+        this.reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').reduce;
+        // 复用单一 AudioContext,避免泄漏
+        this.audioContext = null;
         this.setupAvatarClick();
         this.setupScrollEffects();
         this.setupEasterEggs();
+    }
+    
+    // 懒加载 AudioContext(首次使用时创建,后续复用)
+    getAudioContext() {
+        if (!this.audioContext) {
+            const AC = window.AudioContext || window.webkitAudioContext;
+            if (AC) this.audioContext = new AC();
+        }
+        // 浏览器策略:suspended 状态需 resume
+        if (this.audioContext && this.audioContext.state === 'suspended') {
+            this.audioContext.resume().catch(() => {});
+        }
+        return this.audioContext;
     }
     
     // 头像点击特效
@@ -23,7 +40,7 @@ class InteractiveEffects {
                 this.triggerSpecialEffect();
             }
             
-            // 播放声音提示（如果需要可以添加音效）
+            // 播放声音提示
             this.playClickSound();
         });
     }
@@ -122,8 +139,9 @@ class InteractiveEffects {
     }
     
     playClickSound() {
-        // 创建一个简单的音效（使用Web Audio API）
-        const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        const audioContext = this.getAudioContext();
+        if (!audioContext) return;
+        
         const oscillator = audioContext.createOscillator();
         const gainNode = audioContext.createGain();
         
@@ -140,17 +158,23 @@ class InteractiveEffects {
         oscillator.stop(audioContext.currentTime + 0.1);
     }
     
-    // 滚动特效
+    // 滚动特效(使用 requestAnimationFrame 节流)
     setupScrollEffects() {
+        let ticking = false;
         window.addEventListener('scroll', () => {
-            const scrolled = window.pageYOffset;
-            const avatar = document.querySelector('#avatar img');
-            
-            if (avatar) {
-                // 头像随滚动轻微旋转
-                avatar.style.transform = `rotate(${scrolled * 0.05}deg) scale(${1 + scrolled * 0.0001})`;
-            }
-        });
+            if (ticking) return;
+            ticking = true;
+            requestAnimationFrame(() => {
+                const scrolled = window.pageYOffset;
+                const avatar = document.querySelector('#avatar img');
+                
+                if (avatar) {
+                    // 头像随滚动轻微旋转
+                    avatar.style.transform = `rotate(${scrolled * 0.05}deg) scale(${1 + scrolled * 0.0001})`;
+                }
+                ticking = false;
+            });
+        }, { passive: true });
     }
     
     // 彩蛋：Konami代码
@@ -170,11 +194,14 @@ class InteractiveEffects {
             }
         });
         
-        // 双击标题触发彩蛋
-        const title = document.querySelector('.top-section-content h2');
-        if (title) {
-            title.addEventListener('dblclick', () => {
-                this.activateRainbowMode();
+        // 双击标题触发彩蛋(注意:打字机效果会覆盖标题内容,此处监听父容器避免冲突)
+        const titleContainer = document.querySelector('.top-section-content');
+        if (titleContainer) {
+            titleContainer.addEventListener('dblclick', (e) => {
+                // 仅当双击目标为 h2 或其子节点时触发
+                if (e.target.closest('h2')) {
+                    this.activateRainbowMode();
+                }
             });
         }
     }
@@ -231,12 +258,15 @@ class InteractiveEffects {
             hue = (hue + 2) % 360;
             document.documentElement.style.setProperty('--primary-color', `hsl(${hue}, 70%, 60%)`);
             document.documentElement.style.setProperty('--secondary-color', `hsl(${(hue + 60) % 360}, 70%, 60%)`);
+            // 同步更新 --h-title-color,确保所有标题生效
+            document.documentElement.style.setProperty('--h-title-color', `hsl(${hue}, 70%, 60%)`);
         }, 50);
         
         setTimeout(() => {
             clearInterval(rainbowInterval);
             document.documentElement.style.setProperty('--primary-color', '#6a5acd');
             document.documentElement.style.setProperty('--secondary-color', '#ff69b4');
+            document.documentElement.style.setProperty('--h-title-color', '#6a5acd');
         }, 5000);
     }
 }

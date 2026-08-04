@@ -2,16 +2,20 @@
 
 
 :root{
-    --h-title-color:#3948d2;
+    /* 统一使用 --primary-color 体系,与 index.html 内联变量保持一致 */
+    --primary-color: #6a5acd;
+    --secondary-color: #ff69b4;
+    /* 兼容旧引用:--h-title-color 指向 --primary-color,确保彩虹模式彩蛋对所有标题生效 */
+    --h-title-color: var(--primary-color);
 }
 
 .header {
-    border-bottom: solid 2px var(--bs-blue);
+    border-bottom: solid 2px var(--primary-color);
     z-index: 10000;
 }
 
 .bg-bottom {
-    background-color: var(--h-title-color);
+    background-color: var(--primary-color);
 }
 
 .top-section {
@@ -42,8 +46,8 @@
 }
 
 section header h2{
-    font-family: "Kanit", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji" !important;
-    color: var(--h-title-color);
+    font-family: "Kanit", "Noto Sans SC", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji" !important;
+    color: var(--primary-color);
     font-size: 2.3rem;
     line-height: 4rem;
 }

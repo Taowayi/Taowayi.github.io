@@ -40,7 +40,7 @@ class MusicPlayer {
                 align-items: center;
                 gap: 15px;
                 color: white;
-                font-family: 'Noto Sans JP', sans-serif;
+                font-family: 'Noto Sans SC', sans-serif;
                 cursor: move;
                 transition: all 0.3s ease;
                 backdrop-filter: blur(10px);
@@ -135,7 +135,7 @@ class MusicPlayer {
             this.close();
         });
         
-        // 拖拽功能
+        // 拖拽功能(使用 transform 提升性能)
         player.addEventListener('mousedown', (e) => {
             // 如果点击的是按钮，不启动拖拽
             if (e.target.closest('button')) return;
@@ -144,6 +144,10 @@ class MusicPlayer {
             const rect = player.getBoundingClientRect();
             this.dragOffset.x = e.clientX - rect.left;
             this.dragOffset.y = e.clientY - rect.top;
+            // 切换为绝对定位以便用 transform 移动
+            player.style.left = rect.left + 'px';
+            player.style.top = rect.top + 'px';
+            player.style.bottom = 'auto';
             player.style.transition = 'none';
         });
         
@@ -153,9 +157,8 @@ class MusicPlayer {
             const x = e.clientX - this.dragOffset.x;
             const y = e.clientY - this.dragOffset.y;
             
-            player.style.left = x + 'px';
-            player.style.top = y + 'px';
-            player.style.bottom = 'auto';
+            // 使用 transform 代替 left/top,触发 GPU 加速
+            player.style.transform = `translate(${x}px, ${y}px)`;
         });
         
         document.addEventListener('mouseup', () => {
